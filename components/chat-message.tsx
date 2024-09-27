@@ -79,16 +79,15 @@ export function ChatMessage({ message, ...props }: ChatMessageProps) {
   )
 }
 
-// addition below
-
-export const BotMessage = ({ content }: { content: string }) => (
-  <div className="bot-message">
+// New BioSarthi Message Types
+export const ProductInfoMessage = ({ content }: { content: string }) => (
+  <div className="p-4 bg-yellow-100 text-yellow-900 rounded-lg mb-2 shadow-md">
     <p>{content}</p>
   </div>
 );
 
-export const SystemMessage = ({ children }: { children: React.ReactNode }) => (
-  <div className="system-message">
-    {children}
+export const CalculationResultMessage = ({ content }: { content: string }) => (
+  <div className="p-4 bg-blue-100 text-blue-900 rounded-lg mb-2 shadow-md">
+    <p>{content}</p>
   </div>
 );
