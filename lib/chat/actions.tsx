@@ -1,115 +1,45 @@
-import 'server-only'
+// Import necessary dependencies and utilities
+import 'server-only';
+import { createAI, createStreamableUI, getMutableAIState, streamUI, createStreamableValue } from 'ai/rsc';
+import { nanoid } from 'nanoid';
+import { z } from 'zod';
+import { formatNumber, sleep } from '@/lib/utils';
+import { saveLeadToCRM } from '@/lib/crm';
+import { BotMessage, SystemMessage, UserMessage } from '@/components/chat-message';
+import { Dialog, Button } from '@/components/ui';
+import { Chat, Message } from '@/lib/types';
+import { auth } from '@/auth';
 
-import {
-  createAI,
-  createStreamableUI,
-  getMutableAIState,
-  getAIState,
-  streamUI,
-  createStreamableValue
-} from 'ai/rsc'
-import { openai } from '@ai-sdk/openai'
+// Define the interface for the bot's AI state
+export type AIState = {
+  chatId: string;
+  messages: Message[];
+};
 
-import {
-  spinner,
-  BotCard,
-  BotMessage,
-  SystemMessage,
-  Stock,
-  Purchase
-} from '@/components/stocks'
+export type UIState = {
+  id: string;
+  display: React.ReactNode;
+}[];
 
-import { z } from 'zod'
-import { EventsSkeleton } from '@/components/stocks/events-skeleton'
-import { Events } from '@/components/stocks/events'
-import { StocksSkeleton } from '@/components/stocks/stocks-skeleton'
-import { Stocks } from '@/components/stocks/stocks'
-import { StockSkeleton } from '@/components/stocks/stock-skeleton'
-import {
-  formatNumber,
-  runAsyncFnWithoutBlocking,
-  sleep,
-  nanoid
-} from '@/lib/utils'
-import { saveChat } from '@/app/actions'
-import { SpinnerMessage, UserMessage } from '@/components/stocks/message'
-import { Chat, Message } from '@/lib/types'
-import { auth } from '@/auth'
+// Provide a friendly introduction about the bot without revealing internal details
+async function provideIntroduction() {
+  'use server';
+  return `
+    Hello! I'm the BioSarthi assistant, here to support you with all your biogas-related questions and needs.
+    I can help you with:
+    - Understanding how BioSarthi’s products can enhance your biogas plant’s productivity.
+    - Performing biogas calculations like estimating methane yield and energy potential.
+    - Offering guidance on the best equipment for your specific biogas requirements.
+    - Educating you about the biogas industry, sustainability, and more.
 
-async function confirmPurchase(symbol: string, price: number, amount: number) {
-  'use server'
-
-  const aiState = getMutableAIState<typeof AI>()
-
-  const purchasing = createStreamableUI(
-    <div className="inline-flex items-start gap-1 md:items-center">
-      {spinner}
-      <p className="mb-2">
-        Purchasing {amount} ${symbol}...
-      </p>
-    </div>
-  )
-
-  const systemMessage = createStreamableUI(null)
-
-  runAsyncFnWithoutBlocking(async () => {
-    await sleep(1000)
-
-    purchasing.update(
-      <div className="inline-flex items-start gap-1 md:items-center">
-        {spinner}
-        <p className="mb-2">
-          Purchasing {amount} ${symbol}... working on it...
-        </p>
-      </div>
-    )
-
-    await sleep(1000)
-
-    purchasing.done(
-      <div>
-        <p className="mb-2">
-          You have successfully purchased {amount} ${symbol}. Total cost:{' '}
-          {formatNumber(amount * price)}
-        </p>
-      </div>
-    )
-
-    systemMessage.done(
-      <SystemMessage>
-        You have purchased {amount} shares of {symbol} at ${price}. Total cost ={' '}
-        {formatNumber(amount * price)}.
-      </SystemMessage>
-    )
-
-    aiState.done({
-      ...aiState.get(),
-      messages: [
-        ...aiState.get().messages,
-        {
-          id: nanoid(),
-          role: 'system',
-          content: `[User has purchased ${amount} shares of ${symbol} at ${price}. Total cost = ${
-            amount * price
-          }]`
-        }
-      ]
-    })
-  })
-
-  return {
-    purchasingUI: purchasing.value,
-    newMessage: {
-      id: nanoid(),
-      display: systemMessage.value
-    }
-  }
+    Feel free to ask me any questions, and I'll be happy to assist you!
+  `;
 }
 
+// Submit user messages and respond based on the context of the query
 async function submitUserMessage(content: string) {
-  'use server'
-
-  const aiState = getMutableAIState<typeof AI>()
+  'use server';
+  const aiState = getMutableAIState<typeof AI>();
 
   aiState.update({
     ...aiState.get(),
@@ -118,63 +48,34 @@ async function submitUserMessage(content: string) {
       {
         id: nanoid(),
         role: 'user',
-        content
-      }
-    ]
-  })
+        content,
+      },
+    ],
+  });
 
-  let textStream: undefined | ReturnType<typeof createStreamableValue<string>>
-  let textNode: undefined | React.ReactNode
+  let textStream: undefined | ReturnType<typeof createStreamableValue<string>>;
+  let textNode: undefined | React.ReactNode;
 
   const result = await streamUI({
-    model: openai('gpt-3.5-turbo'),
-    initial: <SpinnerMessage />,
+    model: openai('gpt-4o-mini'), // Modify to your preferred AI model
+    initial: <BotMessage content="Processing your request..." />,
     system: `
-  You are an intelligent virtual assistant for BioSarthi, an innovative company focused on enhancing the biogas industry through advanced technology and real-time monitoring systems. Your primary role is to assist users by providing expert guidance on biogas-related topics, offering detailed information about BioSarthi's products and services, and helping users make informed decisions about their biogas requirements.
-
-  1. **Introduction & Guidance**:
-     - Greet users and offer to assist them with any questions related to biogas or BioSarthi.
-     - Proactively share information about BioSarthi's offerings, including our patented BioSarthi® Real-Time Monitoring System, slurry separation equipment, and other biogas solutions.
-     - Explain the benefits of these systems, such as improved productivity, better waste management, and enhanced ROI.
-
-  2. **Biogas Calculations & Recommendations**:
-     - Provide technical assistance with biogas-related calculations, such as estimating methane yield, energy potential, and system efficiency based on user-provided inputs like waste type and quantity.
-     - Offer insights on how to optimize biogas production based on local waste availability and other contextual factors.
-     - Suggest suitable BioSarthi products based on the user's unique requirements.
-
-  3. **Lead Generation & CRM Integration**:
-     - If a user expresses interest in BioSarthi's products or services, gather their contact details (name, email, phone number, etc.) and record this information as a lead in our Frappe CRM.
-     - Politely ask for more details about their biogas plant, operational challenges, and what specific assistance they are looking for. The more context you have, the better you can assist them.
-
-  4. **Product & Purchase Guidance**:
-     - Provide detailed product descriptions, pricing, and purchasing options for BioSarthi’s offerings.
-     - Offer to guide users through the purchase process, including creating a quote or forwarding their inquiry to the sales team.
-
-  5. **Educational Support**:
-     - Educate users about the biogas industry, the benefits of adopting biogas technology, and how it contributes to sustainability and environmental goals.
-     - Explain complex technical concepts in a simple, easy-to-understand language. Adjust the complexity of your responses based on the user's knowledge level, whether they are beginners or experts.
-
-  6. **Professional & Friendly Tone**:
-     - Maintain a professional yet friendly tone in all interactions.
-     - Be concise and provide actionable advice whenever possible. Be patient and thorough in your responses.
-     - Use structured responses, bullet points, or numbered lists when explaining complex topics to ensure clarity.
-
-  Overall, your goal is to be a helpful assistant that not only answers questions but also encourages users to engage further with BioSarthi’s offerings. Always look for opportunities to create value by connecting users with the right solutions.`,
+      You are a biogas assistant for BioSarthi. You help users understand the biogas industry, perform biogas-related calculations, and provide information about BioSarthi's products and services. If the user shares their contact details, forward them to the CRM.
+    `,
     messages: [
       ...aiState.get().messages.map((message: any) => ({
         role: message.role,
         content: message.content,
-        name: message.name
-      }))
+      })),
     ],
     text: ({ content, done, delta }) => {
       if (!textStream) {
-        textStream = createStreamableValue('')
-        textNode = <BotMessage content={textStream.value} />
+        textStream = createStreamableValue('');
+        textNode = <BotMessage content={textStream.value} />;
       }
 
       if (done) {
-        textStream.done()
+        textStream.done();
         aiState.done({
           ...aiState.get(),
           messages: [
@@ -182,373 +83,60 @@ async function submitUserMessage(content: string) {
             {
               id: nanoid(),
               role: 'assistant',
-              content
-            }
-          ]
-        })
+              content,
+            },
+          ],
+        });
       } else {
-        textStream.update(delta)
+        textStream.update(delta);
       }
 
-      return textNode
+      return textNode;
     },
     tools: {
-      listStocks: {
-        description: 'List three imaginary stocks that are trending.',
-        parameters: z.object({
-          stocks: z.array(
-            z.object({
-              symbol: z.string().describe('The symbol of the stock'),
-              price: z.number().describe('The price of the stock'),
-              delta: z.number().describe('The change in price of the stock')
-            })
-          )
-        }),
-        generate: async function* ({ stocks }) {
-          yield (
-            <BotCard>
-              <StocksSkeleton />
-            </BotCard>
-          )
+      // Tool for providing a friendly introduction about the bot's capabilities
+      introduction: {
+        description: 'Provide a brief introduction about the bot and its capabilities',
+        generate: async function* () {
+          yield <SystemMessage>Here’s what I can help you with:</SystemMessage>;
 
-          await sleep(1000)
-
-          const toolCallId = nanoid()
-
-          aiState.done({
-            ...aiState.get(),
-            messages: [
-              ...aiState.get().messages,
-              {
-                id: nanoid(),
-                role: 'assistant',
-                content: [
-                  {
-                    type: 'tool-call',
-                    toolName: 'listStocks',
-                    toolCallId,
-                    args: { stocks }
-                  }
-                ]
-              },
-              {
-                id: nanoid(),
-                role: 'tool',
-                content: [
-                  {
-                    type: 'tool-result',
-                    toolName: 'listStocks',
-                    toolCallId,
-                    result: stocks
-                  }
-                ]
-              }
-            ]
-          })
-
-          return (
-            <BotCard>
-              <Stocks props={stocks} />
-            </BotCard>
-          )
-        }
+          const introMessage = await provideIntroduction();
+          yield <BotMessage content={introMessage} />;
+        },
       },
-      showStockPrice: {
-        description:
-          'Get the current stock price of a given stock or currency. Use this to show the price to the user.',
-        parameters: z.object({
-          symbol: z
-            .string()
-            .describe(
-              'The name or symbol of the stock or currency. e.g. DOGE/AAPL/USD.'
-            ),
-          price: z.number().describe('The price of the stock.'),
-          delta: z.number().describe('The change in price of the stock')
-        }),
-        generate: async function* ({ symbol, price, delta }) {
-          yield (
-            <BotCard>
-              <StockSkeleton />
-            </BotCard>
-          )
 
-          await sleep(1000)
-
-          const toolCallId = nanoid()
-
-          aiState.done({
-            ...aiState.get(),
-            messages: [
-              ...aiState.get().messages,
-              {
-                id: nanoid(),
-                role: 'assistant',
-                content: [
-                  {
-                    type: 'tool-call',
-                    toolName: 'showStockPrice',
-                    toolCallId,
-                    args: { symbol, price, delta }
-                  }
-                ]
-              },
-              {
-                id: nanoid(),
-                role: 'tool',
-                content: [
-                  {
-                    type: 'tool-result',
-                    toolName: 'showStockPrice',
-                    toolCallId,
-                    result: { symbol, price, delta }
-                  }
-                ]
-              }
-            ]
-          })
-
-          return (
-            <BotCard>
-              <Stock props={{ symbol, price, delta }} />
-            </BotCard>
-          )
-        }
-      },
-      showStockPurchase: {
-        description:
-          'Show price and the UI to purchase a stock or currency. Use this if the user wants to purchase a stock or currency.',
-        parameters: z.object({
-          symbol: z
-            .string()
-            .describe(
-              'The name or symbol of the stock or currency. e.g. DOGE/AAPL/USD.'
-            ),
-          price: z.number().describe('The price of the stock.'),
-          numberOfShares: z
-            .number()
-            .optional()
-            .describe(
-              'The **number of shares** for a stock or currency to purchase. Can be optional if the user did not specify it.'
-            )
-        }),
-        generate: async function* ({ symbol, price, numberOfShares = 100 }) {
-          const toolCallId = nanoid()
-
-          if (numberOfShares <= 0 || numberOfShares > 1000) {
-            aiState.done({
-              ...aiState.get(),
-              messages: [
-                ...aiState.get().messages,
-                {
-                  id: nanoid(),
-                  role: 'assistant',
-                  content: [
-                    {
-                      type: 'tool-call',
-                      toolName: 'showStockPurchase',
-                      toolCallId,
-                      args: { symbol, price, numberOfShares }
-                    }
-                  ]
-                },
-                {
-                  id: nanoid(),
-                  role: 'tool',
-                  content: [
-                    {
-                      type: 'tool-result',
-                      toolName: 'showStockPurchase',
-                      toolCallId,
-                      result: {
-                        symbol,
-                        price,
-                        numberOfShares,
-                        status: 'expired'
-                      }
-                    }
-                  ]
-                },
-                {
-                  id: nanoid(),
-                  role: 'system',
-                  content: `[User has selected an invalid amount]`
-                }
-              ]
-            })
-
-            return <BotMessage content={'Invalid amount'} />
-          } else {
-            aiState.done({
-              ...aiState.get(),
-              messages: [
-                ...aiState.get().messages,
-                {
-                  id: nanoid(),
-                  role: 'assistant',
-                  content: [
-                    {
-                      type: 'tool-call',
-                      toolName: 'showStockPurchase',
-                      toolCallId,
-                      args: { symbol, price, numberOfShares }
-                    }
-                  ]
-                },
-                {
-                  id: nanoid(),
-                  role: 'tool',
-                  content: [
-                    {
-                      type: 'tool-result',
-                      toolName: 'showStockPurchase',
-                      toolCallId,
-                      result: {
-                        symbol,
-                        price,
-                        numberOfShares
-                      }
-                    }
-                  ]
-                }
-              ]
-            })
-
-            return (
-              <BotCard>
-                <Purchase
-                  props={{
-                    numberOfShares,
-                    symbol,
-                    price: +price,
-                    status: 'requires_action'
-                  }}
-                />
-              </BotCard>
-            )
-          }
-        }
-      },
-      getEvents: {
-        description:
-          'List funny imaginary events between user highlighted dates that describe stock activity.',
-        parameters: z.object({
-          events: z.array(
-            z.object({
-              date: z
-                .string()
-                .describe('The date of the event, in ISO-8601 format'),
-              headline: z.string().describe('The headline of the event'),
-              description: z.string().describe('The description of the event')
-            })
-          )
-        }),
-        generate: async function* ({ events }) {
-          yield (
-            <BotCard>
-              <EventsSkeleton />
-            </BotCard>
-          )
-
-          await sleep(1000)
-
-          const toolCallId = nanoid()
-
-          aiState.done({
-            ...aiState.get(),
-            messages: [
-              ...aiState.get().messages,
-              {
-                id: nanoid(),
-                role: 'assistant',
-                content: [
-                  {
-                    type: 'tool-call',
-                    toolName: 'getEvents',
-                    toolCallId,
-                    args: { events }
-                  }
-                ]
-              },
-              {
-                id: nanoid(),
-                role: 'tool',
-                content: [
-                  {
-                    type: 'tool-result',
-                    toolName: 'getEvents',
-                    toolCallId,
-                    result: events
-                  }
-                ]
-              }
-            ]
-          })
-
-          return (
-            <BotCard>
-              <Events props={events} />
-            </BotCard>
-          )
-        }
-      }
-    }
-  })
+      // Other tools like `saveLead`, `biogasCalculations`, `productInquiry` can be included here...
+    },
+  });
 
   return {
     id: nanoid(),
-    display: result.value
-  }
+    display: result.value,
+  };
 }
 
-export type AIState = {
-  chatId: string
-  messages: Message[]
-}
-
-export type UIState = {
-  id: string
-  display: React.ReactNode
-}[]
-
+// Define the AI structure and initial state for the BioSarthi bot
 export const AI = createAI<AIState, UIState>({
   actions: {
     submitUserMessage,
-    confirmPurchase
   },
   initialUIState: [],
   initialAIState: { chatId: nanoid(), messages: [] },
-  onGetUIState: async () => {
-    'use server'
-
-    const session = await auth()
-
-    if (session && session.user) {
-      const aiState = getAIState() as Chat
-
-      if (aiState) {
-        const uiState = getUIStateFromAIState(aiState)
-        return uiState
-      }
-    } else {
-      return
-    }
-  },
   onSetAIState: async ({ state, done }) => {
-    'use server'
+    'use server';
+    if (!done) return;
 
-    if (!done) return
+    const session = await auth();
+    if (!session || !session.user) return;
 
-    const session = await auth()
-    if (!session || !session.user) return
+    const { chatId, messages } = state;
 
-    const { chatId, messages } = state
+    const createdAt = new Date();
+    const userId = session.user.id as string;
+    const path = `/chat/${chatId}`;
 
-    const createdAt = new Date()
-    const userId = session.user.id as string
-    const path = `/chat/${chatId}`
-
-    const firstMessageContent = messages[0].content as string
-    const title = firstMessageContent.substring(0, 100)
+    const firstMessageContent = messages[0].content as string;
+    const title = firstMessageContent.substring(0, 100);
 
     const chat: Chat = {
       id: chatId,
@@ -556,49 +144,9 @@ export const AI = createAI<AIState, UIState>({
       userId,
       createdAt,
       messages,
-      path
-    }
+      path,
+    };
 
-    await saveChat(chat)
-  }
-})
-
-export const getUIStateFromAIState = (aiState: Chat) => {
-  return aiState.messages
-    .filter(message => message.role !== 'system')
-    .map((message, index) => ({
-      id: `${aiState.chatId}-${index}`,
-      display:
-        message.role === 'tool' ? (
-          message.content.map(tool => {
-            return tool.toolName === 'listStocks' ? (
-              <BotCard>
-                {/* TODO: Infer types based on the tool result*/}
-                {/* @ts-expect-error */}
-                <Stocks props={tool.result} />
-              </BotCard>
-            ) : tool.toolName === 'showStockPrice' ? (
-              <BotCard>
-                {/* @ts-expect-error */}
-                <Stock props={tool.result} />
-              </BotCard>
-            ) : tool.toolName === 'showStockPurchase' ? (
-              <BotCard>
-                {/* @ts-expect-error */}
-                <Purchase props={tool.result} />
-              </BotCard>
-            ) : tool.toolName === 'getEvents' ? (
-              <BotCard>
-                {/* @ts-expect-error */}
-                <Events props={tool.result} />
-              </BotCard>
-            ) : null
-          })
-        ) : message.role === 'user' ? (
-          <UserMessage>{message.content as string}</UserMessage>
-        ) : message.role === 'assistant' &&
-          typeof message.content === 'string' ? (
-          <BotMessage content={message.content} />
-        ) : null
-    }))
-}
+    await saveChat(chat);
+  },
+});
