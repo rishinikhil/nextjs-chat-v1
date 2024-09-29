@@ -1,4 +1,4 @@
-import 'server-only'
+import 'server-only';
 
 import {
   createAI,
@@ -7,8 +7,8 @@ import {
   getAIState,
   streamUI,
   createStreamableValue
-} from 'ai/rsc'
-import { openai } from '@ai-sdk/openai'
+} from 'ai/rsc';
+import { openai } from '@ai-sdk/openai';
 
 // Commented out stock-related components to avoid interference
 // import {
@@ -18,25 +18,26 @@ import { openai } from '@ai-sdk/openai'
 //   SystemMessage,
 //   Stock,
 //   Purchase
-// } from '@/components/stocks'
+// } from '@/components/stocks';
 
-import { z } from 'zod'
-// import { EventsSkeleton } from '@/components/stocks/events-skeleton'
-// import { Events } from '@/components/stocks/events'
-// import { StocksSkeleton } from '@/components/stocks/stocks-skeleton'
-// import { Stocks } from '@/components/stocks/stocks'
-// import { StockSkeleton } from '@/components/stocks/stock-skeleton'
+import { z } from 'zod';
+// import { EventsSkeleton } from '@/components/stocks/events-skeleton';
+// import { Events } from '@/components/stocks/events';
+// import { StocksSkeleton } from '@/components/stocks/stocks-skeleton';
+// import { Stocks } from '@/components/stocks/stocks';
+// import { StockSkeleton } from '@/components/stocks/stock-skeleton';
 import {
   formatNumber,
   runAsyncFnWithoutBlocking,
   sleep,
   nanoid
-} from '@/lib/utils'
-import { saveChat } from '@/app/actions'
-// import { SpinnerMessage, UserMessage } from '@/components/stocks/message'
-import { Chat, Message } from '@/lib/types'
-import { auth } from '@/auth'
+} from '@/lib/utils';
+import { saveChat } from '@/app/actions';
+// import { SpinnerMessage, UserMessage } from '@/components/stocks/message';
+import { Chat, Message } from '@/lib/types';
+import { auth } from '@/auth';
 
+// Commented out stock-related purchase function
 // async function confirmPurchase(symbol: string, price: number, amount: number) {
 //   'use server'
 
@@ -108,9 +109,9 @@ import { auth } from '@/auth'
 // }
 
 async function submitUserMessage(content: string) {
-  'use server'
+  'use server';
 
-  const aiState = getMutableAIState<typeof AI>()
+  const aiState = getMutableAIState<typeof AI>();
 
   aiState.update({
     ...aiState.get(),
@@ -119,16 +120,16 @@ async function submitUserMessage(content: string) {
       {
         id: nanoid(),
         role: 'user',
-        content
-      }
-    ]
-  })
+        content,
+      },
+    ],
+  });
 
-  let textStream: undefined | ReturnType<typeof createStreamableValue<string>>
-  let textNode: undefined | React.ReactNode
+  let textStream: undefined | ReturnType<typeof createStreamableValue<string>>;
+  let textNode: undefined | React.ReactNode;
 
   const result = await streamUI({
-    model: openai('gpt-4o-mini'),
+    model: openai('gpt-3.5-turbo'),
     initial: <div>Loading...</div>,
     system: `
   You are BioSarthi, an advanced biogas assistant designed to educate, inform, and guide users in the biogas industry. BioSarthi offers innovative solutions for biogas plant optimization, real-time monitoring, and revenue generation through a patented, IoT-powered platform. Your purpose is to help users learn more about biogas, understand the value of BioSarthi’s offerings, and provide expert recommendations based on their unique requirements.
@@ -200,17 +201,17 @@ async function submitUserMessage(content: string) {
       ...aiState.get().messages.map((message: any) => ({
         role: message.role,
         content: message.content,
-        name: message.name
-      }))
+        name: message.name,
+      })),
     ],
     text: ({ content, done, delta }) => {
       if (!textStream) {
-        textStream = createStreamableValue('')
-        textNode = <BotMessage content={textStream.value} />
+        textStream = createStreamableValue('');
+        textNode = <div>{textStream.value}</div>;
       }
 
       if (done) {
-        textStream.done()
+        textStream.done();
         aiState.done({
           ...aiState.get(),
           messages: [
@@ -218,17 +219,18 @@ async function submitUserMessage(content: string) {
             {
               id: nanoid(),
               role: 'assistant',
-              content
-            }
-          ]
-        })
+              content,
+            },
+          ],
+        });
       } else {
-        textStream.update(delta)
+        textStream.update(delta);
       }
 
-      return textNode
+      return textNode;
     },
     tools: {
+      // Commented out stock-related tools
       // listStocks: {
       //   description: 'List three imaginary stocks that are trending.',
       //   parameters: z.object({
@@ -528,63 +530,63 @@ async function submitUserMessage(content: string) {
       //   }
       // }
     }
-  })
+  });
 
   return {
     id: nanoid(),
-    display: result.value
-  }
+    display: result.value,
+  };
 }
 
 export type AIState = {
-  chatId: string
-  messages: Message[]
-}
+  chatId: string;
+  messages: Message[];
+};
 
 export type UIState = {
-  id: string
-  display: React.ReactNode
-}[]
+  id: string;
+  display: React.ReactNode;
+}[];
 
 export const AI = createAI<AIState, UIState>({
   actions: {
     submitUserMessage,
-    // confirmPurchase
+    // confirmPurchase // Commented out stock-related function
   },
   initialUIState: [],
   initialAIState: { chatId: nanoid(), messages: [] },
   onGetUIState: async () => {
-    'use server'
+    'use server';
 
-    const session = await auth()
+    const session = await auth();
 
     if (session && session.user) {
-      const aiState = getAIState() as Chat
+      const aiState = getAIState() as Chat;
 
       if (aiState) {
-        const uiState = getUIStateFromAIState(aiState)
-        return uiState
+        const uiState = getUIStateFromAIState(aiState);
+        return uiState;
       }
     } else {
-      return
+      return;
     }
   },
   onSetAIState: async ({ state, done }) => {
-    'use server'
+    'use server';
 
-    if (!done) return
+    if (!done) return;
 
-    const session = await auth()
-    if (!session || !session.user) return
+    const session = await auth();
+    if (!session || !session.user) return;
 
-    const { chatId, messages } = state
+    const { chatId, messages } = state;
 
-    const createdAt = new Date()
-    const userId = session.user.id as string
-    const path = `/chat/${chatId}`
+    const createdAt = new Date();
+    const userId = session.user.id as string;
+    const path = `/chat/${chatId}`;
 
-    const firstMessageContent = messages[0].content as string
-    const title = firstMessageContent.substring(0, 100)
+    const firstMessageContent = messages[0].content as string;
+    const title = firstMessageContent.substring(0, 100);
 
     const chat: Chat = {
       id: chatId,
@@ -592,51 +594,27 @@ export const AI = createAI<AIState, UIState>({
       userId,
       createdAt,
       messages,
-      path
-    }
+      path,
+    };
 
-    await saveChat(chat)
+    await saveChat(chat);
   }
-})
+});
 
 export const getUIStateFromAIState = (aiState: Chat) => {
   return aiState.messages
-    .filter(message => message.role !== 'system')
+    .filter((message) => message.role !== 'system')
     .map((message, index) => ({
       id: `${aiState.chatId}-${index}`,
       display:
         message.role === 'tool' ? (
-          message.content.map(tool => {
-            // return tool.toolName === 'listStocks' ? (
-            //   <BotCard>
-            //     {/* TODO: Infer types based on the tool result*/}
-            //     {/* @ts-expect-error */}
-            //     <Stocks props={tool.result} />
-            //   </BotCard>
-            // ) : tool.toolName === 'showStockPrice' ? (
-            //   <BotCard>
-            //     {/* @ts-expect-error */}
-            //     <Stock props={tool.result} />
-            //   </BotCard>
-            // ) : tool.toolName === 'showStockPurchase' ? (
-            //   <BotCard>
-            //     {/* @ts-expect-error */}
-            //     <Purchase props={tool.result} />
-            //   </BotCard>
-            // ) : tool.toolName === 'getEvents' ? (
-            //   <BotCard>
-            //     {/* @ts-expect-error */}
-            //     <Events props={tool.result} />
-            //   </BotCard>
-            // ) : null
-
-            return null
+          message.content.map((tool) => {
+            return null; // Removed rendering of stock-related components
           })
         ) : message.role === 'user' ? (
-          <UserMessage>{message.content as string}</UserMessage>
-        ) : message.role === 'assistant' &&
-          typeof message.content === 'string' ? (
-          <BotMessage content={message.content} />
-        ) : null
-    }))
-}
+          <div>{message.content as string}</div>
+        ) : message.role === 'assistant' && typeof message.content === 'string' ? (
+          <div>{message.content}</div>
+        ) : null,
+    }));
+};
