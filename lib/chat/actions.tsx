@@ -207,7 +207,7 @@ async function submitUserMessage(content: string) {
     text: ({ content, done, delta }) => {
       if (!textStream) {
         textStream = createStreamableValue(''); // Create the streamable value.
-        textNode = <div>{textStream.value || ''}</div>; // Use `textStream.value` safely by checking if it exists.
+        textNode = <div>{''}</div>;
       }
 
       if (done) {
