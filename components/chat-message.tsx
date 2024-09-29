@@ -78,17 +78,3 @@ export function ChatMessage({ message, ...props }: ChatMessageProps) {
     </div>
   )
 }
-
-// addition below
-
-export const BotMessage = ({ content }: { content: string }) => (
-  <div className="bot-message">
-    <p>{content}</p>
-  </div>
-);
-
-export const SystemMessage = ({ children }: { children: React.ReactNode }) => (
-  <div className="system-message">
-    {children}
-  </div>
-);
