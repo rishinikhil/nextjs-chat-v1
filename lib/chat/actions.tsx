@@ -129,7 +129,7 @@ async function submitUserMessage(content: string) {
 
   const result = await streamUI({
     model: openai('gpt-4o-mini'),
-    initial: <div>Loading...</div>,
+    initial: <SpinnerMessage />,
     system: `
   You are BioSarthi, an advanced biogas assistant designed to educate, inform, and guide users in the biogas industry. BioSarthi offers innovative solutions for biogas plant optimization, real-time monitoring, and revenue generation through a patented, IoT-powered platform. Your purpose is to help users learn more about biogas, understand the value of BioSarthi’s offerings, and provide expert recommendations based on their unique requirements.
 
