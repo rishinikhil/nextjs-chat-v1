@@ -17,9 +17,9 @@ export const metadata = {
     : undefined,
   title: {
     default: 'BioSarthi',
-    template: `%s - Next.js AI Chatbot`
+    template: `BioSarthi - Biogas AI`
   },
-  description: 'An AI-powered chatbot template built with Next.js and Vercel.',
+  description: 'Empowering Biogas Ecosystem with Data and AI',
   icons: {
     icon: '/favicon.ico',
     shortcut: '/favicon-16x16.png',
@@ -51,7 +51,7 @@ export default function RootLayout({ children }: RootLayoutProps) {
         <Toaster position="top-center" />
         <Providers
           attribute="class"
-          defaultTheme="system"
+          defaultTheme="light"
           enableSystem
           disableTransitionOnChange
         >
