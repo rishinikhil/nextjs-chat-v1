@@ -183,6 +183,7 @@ export function ChatPanel({
       />
 
       <div className="mx-auto sm:max-w-2xl sm:px-4">
+      {messages.length === 0 && (
         <div className="mb-4 grid grid-cols-2 gap-2 px-4 sm:px-0">
           {/* Render top row messages */}
           {displayedTopMessages.map((example, index) => (
@@ -242,7 +243,7 @@ export function ChatPanel({
             </div>
           ))}
         </div>
-
+        )}
         {messages?.length >= 2 ? (
           <div className="flex h-12 items-center justify-center">
             <div className="flex space-x-2">
@@ -276,6 +277,7 @@ export function ChatPanel({
           <PromptForm input={input} setInput={setInput} />
           <FooterText className="hidden sm:block" />
         </div>
+      
       </div>
     </div>
   )
