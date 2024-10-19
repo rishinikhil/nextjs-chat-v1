@@ -61,6 +61,8 @@ export default function RootLayout({ children }: RootLayoutProps) {
           </div>
           <TailwindIndicator />
         </Providers>
+         <SpeedInsights />
+        <Analytics />
       </body>
     </html>
   )
