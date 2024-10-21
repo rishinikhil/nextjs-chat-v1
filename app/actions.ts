@@ -7,6 +7,142 @@ import { kv } from '@vercel/kv'
 import { auth } from '@/auth'
 import { type Chat } from '@/lib/types'
 
+// Define the type for message data
+
+export async function getAllUsers() {
+  const session = await auth()
+
+  const allowedEmails = ['nikhilrishi@gmail.com', 'one@gmail.com']
+
+  // Check if the user's email is in the allowed emails
+  if (!allowedEmails.includes(session?.user?.email!)) {
+    return [] // Return empty or unauthorized response
+  }
+
+  try {
+    const users = await kv.keys('user:*')
+
+    const modifiedUsers = users
+      .filter(user => user.includes('.com'))
+      .map(user => user.replace('user:', ''))
+
+    return modifiedUsers
+  } catch (error) {
+    return [] // Return an empty array in case of error
+  }
+}
+
+export async function getAllChats() {
+  const session = await auth()
+
+  const allowedEmails = ['nikhilrishi@gmail.com', 'one@gmail.com']
+
+  // Check if the user's email is in the allowed emails
+  if (!allowedEmails.includes(session?.user?.email!)) {
+    return [] // Return empty or unauthorized response
+  }
+
+  try {
+    const chats = await kv.keys('chat:*')
+    const modifiedChats = chats.map(user => user.replace('chat:', ''))
+    return modifiedChats
+  } catch (error) {
+    return [] // Return an empty array in case of error
+  }
+}
+
+export async function getAllChatsWithTimestamps() {
+  const session = await auth()
+
+  const allowedEmails = ['nikhilrishi@gmail.com', 'one@gmail.com']
+
+  // Check if the user's email is in the allowed emails
+  if (!session?.user?.email || !allowedEmails.includes(session.user.email)) {
+    return [] // Return empty array for unauthorized access
+  }
+
+  try {
+    // Get all chat IDs
+    const chats = await kv.keys('chat:*')
+    const modifiedChats = chats.map(chat => chat.replace('chat:', ''))
+    // Fetch chat details (createdAt) for each chat
+    const chatsWithTimestamps = await Promise.all(
+      modifiedChats.map(async chatId => {
+        const chat = await kv.hgetall<Chat>(`chat:${chatId}`)
+
+        // Ensure chat exists and has createdAt timestamp
+        if (chat && chat.createdAt) {
+          return {
+            chatId, // Chat ID
+            createdAt: chat.createdAt // Timestamp
+          }
+        }
+        return null // Return null if no valid chat or timestamp
+      })
+    )
+
+    // Filter out null values (in case any chat was missing or invalid)
+    const validChats = chatsWithTimestamps.filter(chat => chat !== null)
+    validChats.sort((a: any, b: any) => b.createdAt - a.createdAt)
+    // Return the array of valid chats with timestamps
+    return validChats
+  } catch (error) {
+    return [] // Return an empty array in case of error
+  }
+}
+
+export async function chatLog() {
+  const session = await auth()
+
+  const allowedEmails = ['nikhilrishi@gmail.com', 'one@gmail.com']
+
+  // Check if the user's email is in the allowed emails
+  if (!session?.user?.email || !allowedEmails.includes(session.user.email)) {
+    return [] // Return empty array for unauthorized access
+  }
+
+  try {
+    // Get all chat IDs
+    const chatKeys = await kv.keys('chat:*')
+    const chatIds = chatKeys.map(chat => chat.replace('chat:', ''))
+
+    // Fetch chat details (createdAt) for each chat
+    const chatsWithTimestamps = await Promise.all(
+      chatIds.map(async chatId => {
+        try {
+          const chat = await kv.hgetall<Chat>(`chat:${chatId}`)
+          // Ensure chat exists and has a createdAt timestamp
+          if (chat && chat.createdAt) {
+            return {
+              chatId, // Chat ID
+              createdAt: chat.createdAt, // Timestamp
+              user: chat.userId,
+              message: chat?.messages[0].content // User ID associated with the chat
+            }
+          }
+        } catch (error) {
+          console.error(`Error fetching chat ${chatId}:`, error)
+        }
+        return null // Return null if no valid chat or timestamp
+      })
+    )
+
+    // Filter out null values (in case any chat was missing or invalid)
+    const validChats = chatsWithTimestamps.filter(
+      (chat): chat is NonNullable<typeof chat> => chat !== null
+    )
+
+    // Sort valid chats in descending order by createdAt
+    validChats.sort((a, b) => b.createdAt - a.createdAt)
+
+    // Return the array of valid chats with timestamps
+    return validChats
+  } catch (error) {
+    console.error('Error fetching chat logs:', error)
+    return [] // Return an empty array in case of error
+  }
+}
+
 export async function getChats(userId?: string | null) {
   const session = await auth()
 
@@ -38,7 +174,7 @@ export async function getChats(userId?: string | null) {
   }
 }
 
-export async function getChat(id: string, userId: string) {
+export async function getChat(id: string, userId?: string) {
   const session = await auth()
 
   if (userId !== session?.user?.id) {
