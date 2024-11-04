@@ -39,3 +39,8 @@ export interface User extends Record<string, any> {
   password: string
   salt: string
 }
+
+export type ChatWithTimestamp = {
+  chatId: string
+  createdAt: Date
+}
