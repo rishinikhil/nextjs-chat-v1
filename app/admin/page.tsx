@@ -24,9 +24,10 @@ import { ChatWithTimestamp } from '@/lib/types'
 interface Chat {
   chatId: string
   createdAt: number
-  user: string // Adjust the type based on your user structure
-  message: string
+  user: string
+  message: string // Ensure `message` is expected to be a `string`
 }
+
 
 // Define a type-safe AdminPanel component
 const AdminPanel = () => {
@@ -59,12 +60,20 @@ const AdminPanel = () => {
     }
     async function chatlog() {
       try {
-        const response = await chatLog() // Call the chatLog function to get the chat logs
-        const data: Chat[] = response // Ensure the response is typed as Chat[]
-        setChatLogsValue(data) // Update the state with fetched chat logs
+        const response = await chatLog()
+        
+        // Map the response to ensure `message` is a string, filtering out other types
+        const data: Chat[] = response
+          .map((chat: any) => ({
+            chatId: chat.chatId,
+            createdAt: chat.createdAt,
+            user: chat.user,
+            message: typeof chat.message === 'string' ? chat.message : JSON.stringify(chat.message),
+          }))
+    
+        setChatLogsValue(data)
       } catch (error) {
-        console.error('Error fetching chat logs:', error) // Log any errors that occur during the fetch
-        // Optionally set an error state here if needed
+        console.error('Error fetching chat logs:', error)
       }
     }
     userCountFunction()
