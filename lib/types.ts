@@ -1,5 +1,10 @@
 import { CoreMessage } from 'ai'
 
+export type ChatWithTimestamp = {
+  chatId: string
+  createdAt: Date // You can keep this as a Date on the frontend for easy usage
+}
+
 export type Message = CoreMessage & {
   id: string
 }
