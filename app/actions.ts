@@ -7,6 +7,126 @@ import { kv } from '@vercel/kv'
 import { auth } from '@/auth'
 import { type Chat } from '@/lib/types'
 
+export async function getAllUsers() {
+  const session = await auth()
+  const allowedEmails = ['nikhilrishi@gmail.com', 'one@gmail.com']
+
+  if (!allowedEmails.includes(session?.user?.email!)) {
+    return [] // Return empty or unauthorized response
+  }
+
+  try {
+    const users = await kv.keys('user:*')
+    const modifiedUsers = users
+      .filter(user => user.includes('.com'))
+      .map(user => user.replace('user:', ''))
+
+    return modifiedUsers
+  } catch (error) {
+    return [] // Return an empty array in case of error
+  }
+}
+
+export async function getAllChats() {
+  const session = await auth()
+  const allowedEmails = ['nikhilrishi@gmail.com', 'one@gmail.com']
+
+  if (!allowedEmails.includes(session?.user?.email!)) {
+    return [] // Return empty or unauthorized response
+  }
+
+  try {
+    const chats = await kv.keys('chat:*')
+    const modifiedChats = chats.map(chat => chat.replace('chat:', ''))
+    return modifiedChats
+  } catch (error) {
+    return [] // Return an empty array in case of error
+  }
+}
+
+export async function getAllChatsWithTimestamps() {
+  const session = await auth()
+  const allowedEmails = ['nikhilrishi@gmail.com', 'one@gmail.com']
+
+  if (!session?.user?.email || !allowedEmails.includes(session.user.email)) {
+    return [] // Return empty array for unauthorized access
+  }
+
+  try {
+    const chats = await kv.keys('chat:*')
+    const modifiedChats = chats.map(chat => chat.replace('chat:', ''))
+
+    const chatsWithTimestamps = await Promise.all(
+      modifiedChats.map(async chatId => {
+        const chat = await kv.hgetall<Chat>(`chat:${chatId}`)
+        if (chat && chat.createdAt) {
+          return {
+            chatId,
+            createdAt: new Date(Number(chat.createdAt)) // Convert to Date
+          }
+        }
+        return null
+      })
+    )
+
+    const validChats = chatsWithTimestamps.filter(chat => chat !== null) as {
+      chatId: string
+      createdAt: Date
+    }[]
+
+    validChats.sort(
+      (a, b) => (b.createdAt.getTime() || 0) - (a.createdAt.getTime() || 0)
+    )
+    return validChats
+  } catch (error) {
+    console.error('Error fetching chat timestamps:', error)
+    return []
+  }
+}
+
+export async function chatLog() {
+  const session = await auth()
+  const allowedEmails = ['nikhilrishi@gmail.com', 'one@gmail.com']
+
+  if (!session?.user?.email || !allowedEmails.includes(session.user.email)) {
+    return [] // Return empty array for unauthorized access
+  }
+
+  try {
+    const chatKeys = await kv.keys('chat:*')
+    const chatIds = chatKeys.map(chat => chat.replace('chat:', ''))
+
+    const chatsWithTimestamps = await Promise.all(
+      chatIds.map(async chatId => {
+        try {
+          const chat = await kv.hgetall<Chat>(`chat:${chatId}`)
+          if (chat && chat.createdAt) {
+            return {
+              chatId,
+              createdAt: Number(chat.createdAt) || 0,
+              user: chat.userId,
+              message: chat?.messages[0]?.content || ''
+            }
+          }
+        } catch (error) {
+          console.error(`Error fetching chat ${chatId}:`, error)
+        }
+        return null
+      })
+    )
+
+    const validChats = chatsWithTimestamps.filter(
+      (chat): chat is NonNullable<typeof chat> => chat !== null
+    )
+
+    validChats.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0))
+    return validChats
+  } catch (error) {
+    console.error('Error fetching chat logs:', error)
+    return []
+  }
+}
+
 export async function getChats(userId?: string | null) {
   const session = await auth()
 
