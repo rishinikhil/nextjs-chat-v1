@@ -261,11 +261,8 @@ To be the world’s premier biogas ecosystem, transforming energy production and
       //         <StocksSkeleton />
       //       </BotCard>
       //     )
-
       //     await sleep(1000)
-
       //     const toolCallId = nanoid()
-
       //     aiState.done({
       //       ...aiState.get(),
       //       messages: [
@@ -296,7 +293,6 @@ To be the world’s premier biogas ecosystem, transforming energy production and
       //         }
       //       ]
       //     })
-
       //     return (
       //       <BotCard>
       //         <Stocks props={stocks} />
@@ -322,11 +318,8 @@ To be the world’s premier biogas ecosystem, transforming energy production and
       //         <StockSkeleton />
       //       </BotCard>
       //     )
-
       //     await sleep(1000)
-
       //     const toolCallId = nanoid()
-
       //     aiState.done({
       //       ...aiState.get(),
       //       messages: [
@@ -357,7 +350,6 @@ To be the world’s premier biogas ecosystem, transforming energy production and
       //         }
       //       ]
       //     })
-
       //     return (
       //       <BotCard>
       //         <Stock props={{ symbol, price, delta }} />
@@ -384,7 +376,6 @@ To be the world’s premier biogas ecosystem, transforming energy production and
       //   }),
       //   generate: async function* ({ symbol, price, numberOfShares = 100 }) {
       //     const toolCallId = nanoid()
-
       //     if (numberOfShares <= 0 || numberOfShares > 1000) {
       //       aiState.done({
       //         ...aiState.get(),
@@ -426,7 +417,6 @@ To be the world’s premier biogas ecosystem, transforming energy production and
       //           }
       //         ]
       //       })
-
       //       return <BotMessage content={'Invalid amount'} />
       //     } else {
       //       aiState.done({
@@ -463,7 +453,6 @@ To be the world’s premier biogas ecosystem, transforming energy production and
       //           }
       //         ]
       //       })
-
       //       return (
       //         <BotCard>
       //           <Purchase
@@ -499,11 +488,8 @@ To be the world’s premier biogas ecosystem, transforming energy production and
       //         <EventsSkeleton />
       //       </BotCard>
       //     )
-
       //     await sleep(1000)
-
       //     const toolCallId = nanoid()
-
       //     aiState.done({
       //       ...aiState.get(),
       //       messages: [
@@ -534,7 +520,6 @@ To be the world’s premier biogas ecosystem, transforming energy production and
       //         }
       //       ]
       //     })
-
       //     return (
       //       <BotCard>
       //         <Events props={events} />
@@ -596,7 +581,7 @@ export const AI = createAI<AIState, UIState>({
 
     const createdAt = new Date()
     const userId = session.user.id as string
-    const path = `/chat/${chatId}`
+    const path = `/chats/chatid/${chatId}`
 
     const firstMessageContent = messages[0].content as string
     const title = firstMessageContent.substring(0, 100)
