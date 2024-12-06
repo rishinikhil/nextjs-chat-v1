@@ -1,16 +1,17 @@
-import * as React from 'react';
-import Link from 'next/link';
-import { cn } from '@/lib/utils';
-import { auth } from '@/auth';
-import { Button, buttonVariants } from '@/components/ui/button';
-import { UserMenu } from '@/components/user-menu';
-import { SidebarMobile } from './sidebar-mobile';
-import { SidebarToggle } from './sidebar-toggle';
-import { ChatHistory } from './chat-history';
-import { Session } from '@/lib/types';
+import * as React from 'react'
+import Link from 'next/link'
+import { cn } from '@/lib/utils'
+import { auth } from '@/auth'
+import { Button, buttonVariants } from '@/components/ui/button'
+import { UserMenu } from '@/components/user-menu'
+import { SidebarMobile } from './sidebar-mobile'
+import { SidebarToggle } from './sidebar-toggle'
+import { ChatHistory } from './chat-history'
+import { Session } from '@/lib/types'
+import Navbar from './Navbar'
 
 async function UserOrLogin({ isLogo }: { isLogo?: boolean }) {
-  const session = (await auth()) as Session;
+  const session = (await auth()) as Session
 
   if (isLogo) {
     return session?.user ? (
@@ -22,9 +23,13 @@ async function UserOrLogin({ isLogo }: { isLogo?: boolean }) {
       </>
     ) : (
       <Link href="/new" rel="nofollow">
-        <img src="/biosarthi-logo.png" alt="BioSarthi Logo" className="h-7 w-auto" />
+        <img
+          src="/biosarthi-logo.png"
+          alt="BioSarthi Logo"
+          className="h-7 w-auto"
+        />
       </Link>
-    );
+    )
   }
 
   return session?.user ? (
@@ -33,7 +38,7 @@ async function UserOrLogin({ isLogo }: { isLogo?: boolean }) {
     <a href="/login" className={cn(buttonVariants())}>
       <span>Login</span>
     </a>
-  );
+  )
 }
 
 export function Header() {
@@ -45,10 +50,11 @@ export function Header() {
         </React.Suspense>
       </div>
       <div className="flex items-center justify-end space-x-2">
+        <Navbar isAdmin={false} />
         <React.Suspense fallback={<div className="flex-1 overflow-auto" />}>
           <UserOrLogin />
         </React.Suspense>
       </div>
     </header>
-  );
+  )
 }

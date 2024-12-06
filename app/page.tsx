@@ -1,16 +1,16 @@
 'use client'
-import React, { useState, useRef, useEffect } from 'react'
+import React, { useRef, useState, useEffect } from 'react'
 import { Search, Mic, X, ArrowRight, Compass } from 'lucide-react'
 import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
-
+import useSearchStore from './store/useSearchStore'
 // Preset search items with icons and routes
 const presetItems = [
   { icon: Compass, text: 'Marketplace', route: '/marketplace' },
   {
     icon: Compass,
     text: 'Real Time Monitoring System',
-    route: '/vishal ka naam'
+    route: '/monitoringsystem'
   },
   { icon: Search, text: 'ChatNow', route: '/chats' },
   { icon: Search, text: 'Privacy Policy', route: '/privacy' },
@@ -20,9 +20,17 @@ const presetItems = [
 ]
 
 const SearchPage: React.FC = () => {
-  const [searchQuery, setSearchQuery] = useState<string>('')
+  const { searchQuery, setSearchQuery } = useSearchStore()
   const [showSuggestions, setShowSuggestions] = useState<boolean>(false)
   const searchRef = useRef<HTMLDivElement | null>(null)
+
+  const handleSearch = () => {
+    if (searchQuery.trim()) {
+      const searchParams = new URLSearchParams()
+      searchParams.append('q', searchQuery)
+      window.location.href = `/chats?${searchParams.toString()}`
+    }
+  }
 
   // Filter suggestions based on search query
   // Filter through the presetItems array to find matching suggestions
@@ -50,7 +58,7 @@ const SearchPage: React.FC = () => {
   }, [])
 
   return (
-    <div className="h-[92vh] flex flex-col items-center justify-center bg-white">
+    <div className="h-[92vh] flex flex-col overflow-hidden items-center justify-center bg-white">
       {/* Headline */}
       <div className="h-full flex flex-col items-center justify-center">
         <motion.h1
@@ -79,6 +87,11 @@ const SearchPage: React.FC = () => {
               value={searchQuery}
               onChange={e => setSearchQuery(e.target.value)}
               onFocus={() => setShowSuggestions(true)}
+              onKeyDown={e => {
+                if (e.key === 'Enter') {
+                  handleSearch()
+                }
+              }}
               className="flex-grow mx-4 outline-none text-lg"
               placeholder="Search for anything"
             />
@@ -148,11 +161,7 @@ const SearchPage: React.FC = () => {
                   ))
                 ) : (
                   <div
-                    onClick={() => {
-                      const searchParams = new URLSearchParams()
-                      searchParams.append('q', searchQuery)
-                      window.location.href = `/chats?${searchParams.toString()}`
-                    }}
+                    onClick={handleSearch}
                     className="flex items-center px-4 py-3 hover:bg-gray-50 cursor-pointer group"
                   >
                     <Search
