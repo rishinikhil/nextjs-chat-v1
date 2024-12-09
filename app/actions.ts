@@ -7,7 +7,7 @@ import { kv } from '@vercel/kv'
 import { auth } from '@/auth'
 import { type Chat } from '@/lib/types'
 
-const allowedEmails = ['nikhilrishi@gmail.com', 'one@gmail.com']
+const allowedEmails = ['nikhilrishi@gmail.com', 'three@gmail.com']
 
 type messageContent = {
   user: string
@@ -15,14 +15,29 @@ type messageContent = {
 }
 
 type MessageResponse = {
-  id: string // Each message has a unique identifier of type string
-  role: 'user' | 'assistant' // The role is limited to specific values: 'user' or 'assistant'
-  content: string // The content of the message is a string
+  id: string
+  role: 'user' | 'assistant'
+  content: string
 }
+
 type UserIdData = {
   id: string
   email: string
-  messages: MessageResponse[] // Ensure `messages` is defined as an array of `Message` type
+  messages: MessageResponse[]
+}
+
+interface ChatDetails {
+  chatId: string
+  userId: string
+  title: string | null
+  createdAt: number
+  messages: MessageResponse[]
+  path: string
+  sharePath?: string
+}
+
+interface ChatDetailsError {
+  error: string
 }
 
 export async function getAllUsers() {
@@ -416,4 +431,116 @@ export async function getMissingKeys() {
   return keysRequired
     .map(key => (process.env[key] ? '' : key))
     .filter(key => key !== '')
+}
+
+// Type definitions
+interface ChatTableRow {
+  index: number
+  chatId: string
+  userEmail: string
+  createdAt: number
+}
+
+interface ChatHistory {
+  chatId: string
+  messages: MessageResponse[]
+}
+
+// Replace the existing chat table functions with these:
+export async function getChatTable(): Promise<ChatTableRow[]> {
+  const session = await auth()
+
+  if (!allowedEmails.includes(session?.user?.email!)) {
+    return []
+  }
+
+  try {
+    const chatKeys = await kv.keys('chat:*')
+
+    const chatTableData = await Promise.all(
+      chatKeys.map(async chatKey => {
+        const chat = await kv.hgetall<Chat>(chatKey)
+
+        if (!chat) return null
+
+        // First try to get the user data directly
+        const userData = await kv.hgetall<{ email: string }>(
+          `user:${chat.userId}`
+        )
+
+        // If no user data found, try to get from registered users
+        if (!userData?.email) {
+          const registeredUsers = await registeredUsersEmail()
+          const userMatch = registeredUsers.find(
+            user => user.id === chat.userId
+          )
+          if (userMatch) {
+            return {
+              index: 0, // We'll set the correct index after sorting
+              chatId: chat.id,
+              userEmail: userMatch.email,
+              createdAt:
+                typeof chat.createdAt === 'number' ? chat.createdAt : Date.now()
+            } satisfies ChatTableRow
+          }
+        }
+
+        return {
+          index: 0, // We'll set the correct index after sorting
+          chatId: chat.id,
+          userEmail: userData?.email || 'Unknown User',
+          createdAt:
+            typeof chat.createdAt === 'number' ? chat.createdAt : Date.now()
+        } satisfies ChatTableRow
+      })
+    )
+
+    // Filter out null values, sort by createdAt (newest first), and add indices
+    return chatTableData
+      .filter((item): item is ChatTableRow => item !== null)
+      .sort((a, b) => b.createdAt - a.createdAt)
+      .map((item, idx) => ({
+        ...item,
+        index: idx + 1
+      }))
+  } catch (error) {
+    console.error('Error fetching chat table:', error)
+    return []
+  }
+}
+
+export async function getChatHistory(
+  chatId: string
+): Promise<ChatHistory | null> {
+  const session = await auth()
+
+  if (!allowedEmails.includes(session?.user?.email!)) {
+    return null
+  }
+
+  try {
+    const chat = await kv.hgetall<Chat>(`chat:${chatId}`)
+
+    if (!chat) return null
+
+    // Filter and transform messages to match MessageResponse type
+    const filteredMessages = chat.messages
+      .filter(
+        (msg): msg is MessageResponse =>
+          msg.role === 'user' || msg.role === 'assistant'
+      )
+      .map(msg => ({
+        id: msg.id,
+        role: msg.role,
+        content: msg.content
+      }))
+
+    return {
+      chatId: chat.id,
+      messages: filteredMessages
+    }
+  } catch (error) {
+    console.error('Error fetching chat history:', error)
+    return null
+  }
 }

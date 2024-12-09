@@ -19,17 +19,14 @@ import {
 } from '@/components/ui/table'
 import { Button } from '@/components/ui/button'
 import { Tabs, TabsList } from '@/components/ui/tabs'
+import { ReactNode } from 'react'
+import { UserAdminDisplay, Column } from '@/lib/admin-types'
 
-type Column = {
-  header: string
-  accessor: string
-}
-
-type TabDrawerProps = {
+interface TabDrawerProps {
   title: string
-  data: any
+  data: UserAdminDisplay[]
   columns: Column[]
-  icon?: React.ReactNode
+  icon?: ReactNode
   description?: string
 }
 
