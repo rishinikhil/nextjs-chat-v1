@@ -20,6 +20,13 @@ async function UserOrLogin({ isLogo }: { isLogo?: boolean }) {
           <ChatHistory userId={session.user.id} />
         </SidebarMobile>
         <SidebarToggle />
+        <Link href="/new" rel="nofollow">
+          <img
+            src="/biosarthi-logo.png"
+            alt="BioSarthi Logo"
+            className="h-7 w-auto ml-4"
+          />
+        </Link>
       </>
     ) : (
       <Link href="/new" rel="nofollow">

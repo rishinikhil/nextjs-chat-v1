@@ -455,54 +455,51 @@ export async function getChatTable(): Promise<ChatTableRow[]> {
   }
 
   try {
+    // Use pipeline to batch multiple commands into a single request
+    const pipeline = kv.pipeline()
+
+    // Get all chat keys in one request
     const chatKeys = await kv.keys('chat:*')
 
-    const chatTableData = await Promise.all(
-      chatKeys.map(async chatKey => {
-        const chat = await kv.hgetall<Chat>(chatKey)
+    // Batch all chat data requests
+    chatKeys.forEach(chatKey => {
+      pipeline.hgetall(chatKey)
+    })
 
+    // Execute all commands in a single request
+    const chatsData = await pipeline.exec()
+
+    // Process the results
+    const chatTableData = chatsData
+      .map((chat, index) => {
         if (!chat) return null
 
-        // First try to get the user data directly
-        const userData = await kv.hgetall<{ email: string }>(
-          `user:${chat.userId}`
-        )
+        const chatKey = chatKeys[index]
+        const chatData = chat as Chat & { createdAt: number | string }
 
-        // If no user data found, try to get from registered users
-        if (!userData?.email) {
-          const registeredUsers = await registeredUsersEmail()
-          const userMatch = registeredUsers.find(
-            user => user.id === chat.userId
-          )
-          if (userMatch) {
-            return {
-              index: 0, // We'll set the correct index after sorting
-              chatId: chat.id,
-              userEmail: userMatch.email,
-              createdAt:
-                typeof chat.createdAt === 'number' ? chat.createdAt : Date.now()
-            } satisfies ChatTableRow
-          }
-        }
+        // Parse createdAt
+        const createdAt =
+          typeof chatData.createdAt === 'string'
+            ? parseInt(chatData.createdAt, 10)
+            : typeof chatData.createdAt === 'number'
+              ? chatData.createdAt
+              : Date.now()
 
         return {
-          index: 0, // We'll set the correct index after sorting
-          chatId: chat.id,
-          userEmail: userData?.email || 'Unknown User',
-          createdAt:
-            typeof chat.createdAt === 'number' ? chat.createdAt : Date.now()
-        } satisfies ChatTableRow
+          index: 0,
+          chatId: chatData.id || chatKey.replace('chat:', ''),
+          userEmail: chatData.userId || 'Unknown User',
+          createdAt: isNaN(createdAt) ? Date.now() : createdAt
+        }
       })
-    )
-
-    // Filter out null values, sort by createdAt (newest first), and add indices
-    return chatTableData
       .filter((item): item is ChatTableRow => item !== null)
       .sort((a, b) => b.createdAt - a.createdAt)
       .map((item, idx) => ({
         ...item,
         index: idx + 1
       }))
+
+    return chatTableData
   } catch (error) {
     console.error('Error fetching chat table:', error)
     return []

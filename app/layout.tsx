@@ -1,5 +1,4 @@
-import { GeistSans } from 'geist/font/sans'
-import { GeistMono } from 'geist/font/mono'
+import { Questrial } from 'next/font/google'
 
 import '@/app/globals.css'
 import { cn } from '@/lib/utils'
@@ -10,6 +9,13 @@ import { Toaster } from '@/components/ui/sonner'
 
 import { Analytics } from '@vercel/analytics/react'
 import { SpeedInsights } from '@vercel/speed-insights/next'
+
+// Add Questrial font configuration
+const questrial = Questrial({
+  weight: '400',
+  subsets: ['latin'],
+  variable: '--font-questrial'
+})
 
 export const metadata = {
   metadataBase: process.env.VERCEL_URL
@@ -41,13 +47,7 @@ interface RootLayoutProps {
 export default function RootLayout({ children }: RootLayoutProps) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body
-        className={cn(
-          'font-sans antialiased',
-          GeistSans.variable,
-          GeistMono.variable
-        )}
-      >
+      <body className={cn('font-sans antialiased', questrial.variable)}>
         <Toaster position="top-center" />
         <Providers
           attribute="class"
