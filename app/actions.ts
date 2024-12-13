@@ -455,41 +455,59 @@ export async function getChatTable(): Promise<ChatTableRow[]> {
   }
 
   try {
-    // Use pipeline to batch multiple commands into a single request
+    const chatKeys = await kv.keys('chat:*')
     const pipeline = kv.pipeline()
 
-    // Get all chat keys in one request
-    const chatKeys = await kv.keys('chat:*')
-
-    // Batch all chat data requests
-    chatKeys.forEach(chatKey => {
+    for (const chatKey of chatKeys) {
       pipeline.hgetall(chatKey)
-    })
+    }
 
-    // Execute all commands in a single request
     const chatsData = await pipeline.exec()
+    const usersData = await registeredUsersEmail()
+    const userIdToEmailMap = new Map(
+      usersData.map(user => [user.id, user.email])
+    )
 
-    // Process the results
     const chatTableData = chatsData
       .map((chat, index) => {
         if (!chat) return null
 
         const chatKey = chatKeys[index]
         const chatData = chat as Chat & { createdAt: number | string }
+        const userEmail =
+          userIdToEmailMap.get(chatData.userId) || 'Unknown User'
 
-        // Parse createdAt
-        const createdAt =
-          typeof chatData.createdAt === 'string'
-            ? parseInt(chatData.createdAt, 10)
-            : typeof chatData.createdAt === 'number'
-              ? chatData.createdAt
-              : Date.now()
+        // Extract timestamp from the chat key if possible
+        const chatKeyTimestamp = chatKey.split(':')[1]?.split('-')[0]
+
+        // Try different sources for the creation date in order of preference
+        let createdAt: number
+        if (chatData.createdAt && !isNaN(Number(chatData.createdAt))) {
+          createdAt = Number(chatData.createdAt)
+        } else if (chatKeyTimestamp && !isNaN(Number(chatKeyTimestamp))) {
+          createdAt = Number(chatKeyTimestamp)
+        } else {
+          // If no valid timestamp found, try to get it from messages
+          const firstMessage = chatData.messages?.[0]
+          if (firstMessage?.id) {
+            const messageTimestamp = Number(firstMessage.id.split('-')[0])
+            createdAt = !isNaN(messageTimestamp) ? messageTimestamp : Date.now()
+          } else {
+            createdAt = Date.now()
+          }
+        }
+
+        // Validate the timestamp is within reasonable bounds
+        const isValidDate = createdAt > 0 && createdAt <= Date.now()
+        if (!isValidDate) {
+          createdAt = Date.now()
+        }
 
         return {
           index: 0,
           chatId: chatData.id || chatKey.replace('chat:', ''),
-          userEmail: chatData.userId || 'Unknown User',
-          createdAt: isNaN(createdAt) ? Date.now() : createdAt
+          userEmail: userEmail,
+          createdAt
         }
       })
       .filter((item): item is ChatTableRow => item !== null)

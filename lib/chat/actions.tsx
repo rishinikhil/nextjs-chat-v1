@@ -579,7 +579,7 @@ export const AI = createAI<AIState, UIState>({
 
     const { chatId, messages } = state
 
-    const createdAt = new Date()
+    const createdAt = new Date().getTime()
     const userId = session.user.id as string
     const path = `/chats/chatid/${chatId}`
 

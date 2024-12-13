@@ -6,6 +6,9 @@ import { motion, AnimatePresence } from 'framer-motion'
 import useSearchStore from './store/useSearchStore'
 import { GridSmallBackgroundDemo } from '@/components/ui/grid-background'
 import { PlaceholdersAndVanishInput } from '@/components/ui/placeholderAndVanish'
+import { Button, MovingBorder } from '@/components/ui/moving-border'
+import useLanguageStore from './store/useLanguageStore'
+import { useRouter } from 'next/navigation'
 // Preset search items with icons and routes
 const presetItems = [
   { icon: Compass, text: 'Marketplace', route: '/marketplace' },
@@ -55,16 +58,22 @@ declare class SpeechRecognition {
 
 const SearchPage: React.FC = () => {
   const { searchQuery, setSearchQuery } = useSearchStore()
+  const { currentLanguage, setLanguage, translations } = useLanguageStore()
   const [isListening, setIsListening] = useState<boolean>(false)
   const [showSuggestions, setShowSuggestions] = useState<boolean>(false)
   const searchRef = useRef<HTMLDivElement | null>(null)
   const recognitionRef = useRef<SpeechRecognition | null>(null)
+  const router = useRouter()
+
+  // Get current translations
+  const currentTranslations = translations[currentLanguage]
 
   const handleSearch = () => {
     if (searchQuery.trim()) {
-      const searchParams = new URLSearchParams()
-      searchParams.append('q', searchQuery)
-      window.location.href = `/chats?${searchParams.toString()}`
+      // Store the search query in sessionStorage
+      sessionStorage.setItem('initialChatMessage', searchQuery.trim())
+      // Navigate to the chats page
+      router.push('/chats')
     }
   }
 
@@ -165,6 +174,11 @@ const SearchPage: React.FC = () => {
     'Learn about biogas substrate mixing ratios...'
   ]
 
+  // Inside the SearchPage component, add a new handler for input focus
+  const handleInputFocus = () => {
+    setShowSuggestions(true)
+  }
+
   return (
     <div className="h-screen w-full absolute top-0">
       <GridSmallBackgroundDemo>
@@ -177,8 +191,12 @@ const SearchPage: React.FC = () => {
                 transition={{ duration: 0.5 }}
                 className="text-4xl md:text-5xl font-bold mb-12 text-center"
               >
-                <span className="text-[#318832]">Transforming</span>{' '}
-                <span className="text-[#DD2E29]">BioGas Ecosystem</span>
+                <span className="text-[#318832]">
+                  {currentTranslations.title.part1}
+                </span>{' '}
+                <span className="text-[#DD2E29]">
+                  {currentTranslations.title.part2}
+                </span>
               </motion.h1>
 
               <motion.div
@@ -188,18 +206,37 @@ const SearchPage: React.FC = () => {
                 transition={{ delay: 0.2 }}
                 className="w-full max-w-2xl mx-auto relative"
               >
-                <div className="w-full">
-                  <PlaceholdersAndVanishInput
-                    placeholders={searchPlaceholders}
-                    onChange={e => {
-                      setSearchQuery(e.target.value)
-                      setShowSuggestions(true)
-                    }}
-                    onSubmit={e => {
-                      e.preventDefault()
-                      handleSearch()
-                    }}
-                  />
+                <div className="w-full relative">
+                  <div className="absolute inset-0">
+                    {/* First ball at the start */}
+                    <MovingBorder duration={4000} rx="1rem" ry="1rem">
+                      <div className="h-[12px] w-[12px] opacity-[0.3] bg-[radial-gradient(#000000_40%,transparent_60%)]" />
+                    </MovingBorder>
+
+                    {/* Second ball at 50% offset */}
+                    <MovingBorder
+                      duration={4000}
+                      rx="1rem"
+                      ry="1rem"
+                      offset={2000}
+                    >
+                      <div className="h-[12px] w-[12px] opacity-[0.3] bg-[radial-gradient(#000000_40%,transparent_60%)]" />
+                    </MovingBorder>
+                  </div>
+                  <div className="relative z-10">
+                    <PlaceholdersAndVanishInput
+                      placeholders={currentTranslations.searchPlaceholders}
+                      onChange={e => {
+                        setSearchQuery(e.target.value)
+                        setShowSuggestions(true)
+                      }}
+                      onSubmit={e => {
+                        e.preventDefault()
+                        handleSearch()
+                      }}
+                      onFocus={handleInputFocus}
+                    />
+                  </div>
                 </div>
 
                 <AnimatePresence>
@@ -208,8 +245,12 @@ const SearchPage: React.FC = () => {
                       initial={{ opacity: 0, y: -10 }}
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, y: -10 }}
-                      className="absolute w-full bg-white border-x border-b rounded-b-2xl shadow-lg mt-1 z-20 max-h-[400px] overflow-y-auto"
-                      style={{ width: 'calc(100% - 2px)' }}
+                      className="absolute w-full bg-white border-x border-b rounded-2xl shadow-lg mt-1 z-20 max-h-[400px] overflow-y-auto"
+                      style={{
+                        width: 'calc(100% - 2px)',
+                        borderTopLeftRadius: '0',
+                        borderTopRightRadius: '0'
+                      }}
                     >
                       {searchQuery === '' ? (
                         // Show preset items when no search query
@@ -281,13 +322,31 @@ const SearchPage: React.FC = () => {
                   transition={{ delay: 0.3 }}
                   className="flex justify-center mt-4 space-x-4 text-sm mx-auto"
                 >
-                  <span className="text-gray-600">BioSarthi offered in:</span>
-                  <Link href="#" className="text-blue-600 hover:underline">
+                  <span className="text-gray-600">
+                    {currentLanguage === 'en'
+                      ? 'BioSarthi offered in:'
+                      : 'बायोसारथी उपलब्ध है:'}
+                  </span>
+                  <button
+                    onClick={() => setLanguage('en')}
+                    className={`${
+                      currentLanguage === 'en'
+                        ? 'text-blue-600 font-semibold'
+                        : 'text-blue-500'
+                    } hover:underline`}
+                  >
                     English
-                  </Link>
-                  <Link href="#" className="text-blue-600 hover:underline">
+                  </button>
+                  <button
+                    onClick={() => setLanguage('hi')}
+                    className={`${
+                      currentLanguage === 'hi'
+                        ? 'text-blue-600 font-semibold'
+                        : 'text-blue-500'
+                    } hover:underline`}
+                  >
                     हिंदी
-                  </Link>
+                  </button>
                 </motion.div>
               </motion.div>
             </div>
@@ -306,19 +365,19 @@ const SearchPage: React.FC = () => {
                     href="/marketplace"
                     className="hover:underline hover:text-blue-500 transition-colors"
                   >
-                    Marketplace
+                    {currentTranslations.footerLinks.marketplace}
                   </Link>
                   <Link
                     href="/monitoringsystem"
                     className="hover:underline hover:text-blue-500 transition-colors"
                   >
-                    Real Time Monitoring System
+                    {currentTranslations.footerLinks.monitoring}
                   </Link>
                   <Link
                     href="/chats"
                     className="hover:underline hover:text-blue-500 transition-colors"
                   >
-                    ChatNow
+                    {currentTranslations.footerLinks.chat}
                   </Link>
                 </div>
                 <div className="flex flex-wrap gap-6">
@@ -326,25 +385,25 @@ const SearchPage: React.FC = () => {
                     href="/privacy"
                     className="hover:underline hover:text-blue-500 transition-colors"
                   >
-                    Privacy
+                    {currentTranslations.footerLinks.privacy}
                   </Link>
                   <Link
                     href="/terms"
                     className="hover:underline hover:text-blue-500 transition-colors"
                   >
-                    Terms & Conditions
+                    {currentTranslations.footerLinks.terms}
                   </Link>
                   <Link
                     href="/patent"
                     className="hover:underline hover:text-blue-500 transition-colors"
                   >
-                    Patent
+                    {currentTranslations.footerLinks.patent}
                   </Link>
                   <Link
                     href="/copyright"
                     className="hover:underline hover:text-blue-500 transition-colors"
                   >
-                    Copyright
+                    {currentTranslations.footerLinks.copyright}
                   </Link>
                 </div>
               </div>
