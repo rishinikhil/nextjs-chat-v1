@@ -10,19 +10,6 @@ import { Button, MovingBorder } from '@/components/ui/moving-border'
 import useLanguageStore from './store/useLanguageStore'
 import { useRouter } from 'next/navigation'
 // Preset search items with icons and routes
-const presetItems = [
-  { icon: Compass, text: 'Marketplace', route: '/marketplace' },
-  {
-    icon: Compass,
-    text: 'Real Time Monitoring System',
-    route: '/monitoringsystem'
-  },
-  { icon: Search, text: 'ChatNow', route: '/chats' },
-  { icon: Search, text: 'Privacy Policy', route: '/privacy' },
-  { icon: Search, text: 'Terms & Conditions', route: '/terms' },
-  { icon: Search, text: 'Patent Information', route: '/patent' },
-  { icon: Search, text: 'Copyright Details', route: '/copyright' }
-]
 
 // Type definitions for Speech Recognition
 interface IWindow extends Window {
@@ -64,10 +51,51 @@ const SearchPage: React.FC = () => {
   const searchRef = useRef<HTMLDivElement | null>(null)
   const recognitionRef = useRef<SpeechRecognition | null>(null)
   const router = useRouter()
+  const [selectedIndex, setSelectedIndex] = useState<number | null>(null)
 
   // Get current translations
   const currentTranslations = translations[currentLanguage]
 
+  const presetItems = [
+    {
+      icon: Compass,
+      text: currentLanguage === 'hi' ? 'बाजार' : 'Marketplace',
+      route: '/marketplace'
+    },
+    {
+      icon: Compass,
+      text:
+        currentLanguage === 'hi'
+          ? 'वास्तविक समय निगरानी प्रणाली'
+          : 'Real Time Monitoring System',
+      route: '/monitoringsystem'
+    },
+    {
+      icon: Search,
+      text: currentLanguage === 'hi' ? 'चैट अब' : 'ChatNow',
+      route: '/chats'
+    },
+    {
+      icon: Search,
+      text: currentLanguage === 'hi' ? 'गोपनीयता नीति' : 'Privacy Policy',
+      route: '/privacy'
+    },
+    {
+      icon: Search,
+      text: currentLanguage === 'hi' ? 'शर्तें और नियम' : 'Terms & Conditions',
+      route: '/terms'
+    },
+    {
+      icon: Search,
+      text: currentLanguage === 'hi' ? 'पेटेंट जानकारी' : 'Patent Information',
+      route: '/patent'
+    },
+    {
+      icon: Search,
+      text: currentLanguage === 'hi' ? 'कॉपीराइट विवरण' : 'Copyright Details',
+      route: '/copyright'
+    }
+  ]
   const handleSearch = () => {
     if (searchQuery.trim()) {
       // Store the search query in sessionStorage
@@ -77,18 +105,10 @@ const SearchPage: React.FC = () => {
     }
   }
 
-  // Filter suggestions based on search query
-  // Filter through the presetItems array to find matching suggestions
-  // 1. presetItems.filter() creates a new array containing only items that match the condition
-  // 2. For each item, convert both the item text and search query to lowercase
-  // 3. Check if the item text includes the search query as a substring
-  // 4. Returns array of matching items that will be used for suggestions
   const filteredSuggestions = presetItems.filter(item =>
     item.text.toLowerCase().includes(searchQuery.toLowerCase())
   )
 
-  // This useEffect hook handles clicking outside the search component
-  // It closes the suggestions dropdown when clicking anywhere else on the page
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
@@ -179,8 +199,32 @@ const SearchPage: React.FC = () => {
     setShowSuggestions(true)
   }
 
+  const handleKeyDown = (event: React.KeyboardEvent) => {
+    if (event.key === 'ArrowDown') {
+      setSelectedIndex(prevIndex =>
+        prevIndex === null || prevIndex === filteredSuggestions.length - 1
+          ? 0
+          : prevIndex + 1
+      )
+    } else if (event.key === 'ArrowUp') {
+      setSelectedIndex(prevIndex =>
+        prevIndex === null || prevIndex === 0
+          ? filteredSuggestions.length - 1
+          : prevIndex - 1
+      )
+    } else if (event.key === 'Enter') {
+      if (selectedIndex !== null) {
+        // Navigate to the selected suggestion's route
+        window.location.href = filteredSuggestions[selectedIndex].route
+      } else if (searchQuery.trim()) {
+        // If no suggestion is selected, perform the search
+        handleSearch()
+      }
+    }
+  }
+
   return (
-    <div className="h-screen w-full absolute top-0">
+    <div className="h-screen w-full absolute top-0" onKeyDown={handleKeyDown}>
       <GridSmallBackgroundDemo>
         <div className="min-h-screen flex flex-col">
           <div className="flex-grow flex items-center justify-center px-4">
@@ -209,16 +253,16 @@ const SearchPage: React.FC = () => {
                 <div className="w-full relative">
                   <div className="absolute inset-0">
                     {/* First ball at the start */}
-                    <MovingBorder duration={4000} rx="1rem" ry="1rem">
+                    <MovingBorder duration={8000} rx="1rem" ry="1rem">
                       <div className="h-[12px] w-[12px] opacity-[0.3] bg-[radial-gradient(#000000_40%,transparent_60%)]" />
                     </MovingBorder>
 
                     {/* Second ball at 50% offset */}
                     <MovingBorder
-                      duration={4000}
+                      duration={8000}
                       rx="1rem"
                       ry="1rem"
-                      offset={2000}
+                      offset={4000}
                     >
                       <div className="h-[12px] w-[12px] opacity-[0.3] bg-[radial-gradient(#000000_40%,transparent_60%)]" />
                     </MovingBorder>
@@ -279,7 +323,7 @@ const SearchPage: React.FC = () => {
                           <div
                             key={index}
                             onClick={() => (window.location.href = item.route)}
-                            className="flex items-center px-4 py-3 hover:bg-gray-50 cursor-pointer group"
+                            className={`flex items-center px-4 py-3 hover:bg-gray-50 cursor-pointer group ${selectedIndex === index ? 'bg-gray-200' : ''}`}
                           >
                             <item.icon
                               className="text-gray-400 group-hover:text-gray-600"

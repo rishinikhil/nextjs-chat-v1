@@ -1,17 +1,36 @@
+'use client'
+
 import * as React from 'react'
 import Link from 'next/link'
 import { cn } from '@/lib/utils'
 import { auth } from '@/auth'
-import { Button, buttonVariants } from '@/components/ui/button'
+import { buttonVariants } from '@/components/ui/button'
 import { UserMenu } from '@/components/user-menu'
 import { SidebarMobile } from './sidebar-mobile'
 import { SidebarToggle } from './sidebar-toggle'
 import { ChatHistory } from './chat-history'
 import { Session } from '@/lib/types'
 import Navbar from './Navbar'
+import useLanguageStore from '@/app/store/useLanguageStore'
 
+// Separate the login button into its own component to use the hook
+function LoginButton() {
+  const { currentLanguage } = useLanguageStore()
+  return (
+    <a href="/login" className={cn(buttonVariants())}>
+      <span>{currentLanguage === 'en' ? 'Login' : 'प्रवेश करें'}</span>
+    </a>
+  )
+}
+
+// Modified UserOrLogin component
 async function UserOrLogin({ isLogo }: { isLogo?: boolean }) {
-  const session = (await auth()) as Session
+  let session: Session | null = null
+  try {
+    session = (await auth()) as Session
+  } catch (error) {
+    console.error('Authentication error:', error)
+  }
 
   if (isLogo) {
     return session?.user ? (
@@ -39,13 +58,7 @@ async function UserOrLogin({ isLogo }: { isLogo?: boolean }) {
     )
   }
 
-  return session?.user ? (
-    <UserMenu user={session.user} />
-  ) : (
-    <a href="/login" className={cn(buttonVariants())}>
-      <span>Login</span>
-    </a>
-  )
+  return session?.user ? <UserMenu user={session.user} /> : <LoginButton />
 }
 
 export function Header() {
