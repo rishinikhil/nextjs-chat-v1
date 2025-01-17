@@ -100,9 +100,10 @@ const SearchPage: React.FC = () => {
   const handleSearch = () => {
     if (searchQuery.trim()) {
       // Store the search query in sessionStorage
-      sessionStorage.setItem('initialChatMessage', searchQuery.trim())
+      setMessage(searchQuery.trim())
       // Navigate to the chats page
       router.push('/chats')
+      setSearchQuery('')
     }
   }
 
@@ -186,14 +187,6 @@ const SearchPage: React.FC = () => {
       }
     }
   }, [])
-
-  // Add these placeholders
-  const searchPlaceholders = [
-    'Ask about biogas plant maintenance...',
-    'How to optimize biogas production?',
-    'What are the safety protocols for biogas plants?',
-    'Learn about biogas substrate mixing ratios...'
-  ]
 
   // Inside the SearchPage component, add a new handler for input focus
   const handleInputFocus = () => {

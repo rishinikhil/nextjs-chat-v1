@@ -1,4 +1,3 @@
-'use client'
 import * as React from 'react'
 import Link from 'next/link'
 import { cn } from '@/lib/utils'
@@ -10,14 +9,14 @@ import { SidebarToggle } from './sidebar-toggle'
 import { ChatHistory } from './chat-history'
 import { Session } from '@/lib/types'
 import Navbar from './Navbar'
-import useLanguageStore from '@/app/store/useLanguageStore'
+// import useLanguageStore from '@/app/store/useLanguageStore'
 
 // Separate the login button into its own component to use the hook
 function LoginButton() {
-  const { currentLanguage } = useLanguageStore()
+  // const { currentLanguage } = useLanguageStore()
   return (
     <a href="/login" className={cn(buttonVariants())}>
-      <span>{currentLanguage === 'en' ? 'Login' : 'प्रवेश करें'}</span>
+      <span>{'Login'}</span>
     </a>
   )
 }
