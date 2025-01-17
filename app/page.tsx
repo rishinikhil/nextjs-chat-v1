@@ -9,7 +9,7 @@ import { PlaceholdersAndVanishInput } from '@/components/ui/placeholderAndVanish
 import { Button, MovingBorder } from '@/components/ui/moving-border'
 import useLanguageStore from './store/useLanguageStore'
 import { useRouter } from 'next/navigation'
-// Preset search items with icons and routes
+import useMessageStore from './store/useMessageStore'
 
 // Type definitions for Speech Recognition
 interface IWindow extends Window {
@@ -52,6 +52,7 @@ const SearchPage: React.FC = () => {
   const recognitionRef = useRef<SpeechRecognition | null>(null)
   const router = useRouter()
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null)
+  const { setMessage } = useMessageStore()
 
   // Get current translations
   const currentTranslations = translations[currentLanguage]
@@ -213,12 +214,10 @@ const SearchPage: React.FC = () => {
           : prevIndex - 1
       )
     } else if (event.key === 'Enter') {
-      if (selectedIndex !== null) {
-        // Navigate to the selected suggestion's route
-        window.location.href = filteredSuggestions[selectedIndex].route
-      } else if (searchQuery.trim()) {
-        // If no suggestion is selected, perform the search
-        handleSearch()
+      if (searchQuery.trim()) {
+        setSearchQuery(searchQuery.trim())
+        setMessage(searchQuery.trim())
+        router.push('/chats')
       }
     }
   }

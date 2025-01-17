@@ -17,6 +17,7 @@ import {
 import { useEnterSubmit } from '@/lib/hooks/use-enter-submit'
 import { nanoid } from 'nanoid'
 import { useRouter } from 'next/navigation'
+import useMessageStore from '@/app/store/useMessageStore'
 
 export function PromptForm({
   input,
@@ -30,26 +31,29 @@ export function PromptForm({
   const inputRef = React.useRef<HTMLTextAreaElement>(null)
   const { submitUserMessage } = useActions()
   const [_, setMessages] = useUIState<typeof AI>()
+  const { message, setMessage } = useMessageStore() // Use Zustand store actions
 
   React.useEffect(() => {
     if (inputRef.current) {
       inputRef.current.focus()
     }
-  }, [])
+    if (message) {
+      setInput(message) // Set the input value from the store on load
+    }
+  }, [message, setInput])
 
   return (
     <form
       ref={formRef}
-      onSubmit={async (e: any) => {
+      onSubmit={async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault()
 
         // Blur focus on mobile
         if (window.innerWidth < 600) {
-          e.target['message']?.blur()
+          e.currentTarget['message']?.blur()
         }
 
         const value = input.trim()
-        setInput('')
         if (!value) return
 
         // Optimistically add user message UI
@@ -64,6 +68,10 @@ export function PromptForm({
         // Submit and get response message
         const responseMessage = await submitUserMessage(value)
         setMessages(currentMessages => [...currentMessages, responseMessage])
+
+        // Clear input and reset context
+        setInput('')
+        setMessage('') // Clear the Zustand store's `message`
       }}
     >
       <div className="relative flex max-h-60 w-full grow flex-col overflow-hidden bg-background px-8 sm:rounded-md sm:border sm:px-12">
@@ -74,7 +82,7 @@ export function PromptForm({
               size="icon"
               className="absolute left-0 top-[14px] size-8 rounded-full bg-background p-0 sm:left-4"
               onClick={() => {
-                router.push('/new')
+                router.push('/chats')
               }}
             >
               <IconPlus />
@@ -96,7 +104,7 @@ export function PromptForm({
           name="message"
           rows={1}
           value={input}
-          onChange={e => setInput(e.target.value)}
+          onChange={e => setInput(e.target.value)} // Update input state directly
         />
         <div className="absolute right-0 top-[13px] sm:right-4">
           <Tooltip>

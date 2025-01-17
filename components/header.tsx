@@ -1,5 +1,3 @@
-'use client'
-
 import * as React from 'react'
 import Link from 'next/link'
 import { cn } from '@/lib/utils'
@@ -22,7 +20,6 @@ function LoginButton() {
     </a>
   )
 }
-
 // Modified UserOrLogin component
 async function UserOrLogin({ isLogo }: { isLogo?: boolean }) {
   let session: Session | null = null
@@ -31,6 +28,17 @@ async function UserOrLogin({ isLogo }: { isLogo?: boolean }) {
   } catch (error) {
     console.error('Authentication error:', error)
   }
+
+  // Always render the logo
+  const logo = (
+    <Link href="/new" rel="nofollow">
+      <img
+        src="/biosarthi-logo.png"
+        alt="BioSarthi Logo"
+        className={`h-7 w-auto ${isLogo ? 'ml-4' : ''}`}
+      />
+    </Link>
+  )
 
   if (isLogo) {
     return session?.user ? (

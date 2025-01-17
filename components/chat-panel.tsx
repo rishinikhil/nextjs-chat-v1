@@ -10,6 +10,7 @@ import { useAIState, useActions, useUIState } from 'ai/rsc'
 import type { AI } from '@/lib/chat/actions'
 import { nanoid } from 'nanoid'
 import { UserMessage } from './stocks/message'
+import { SubtitlesIcon } from 'lucide-react'
 
 export interface ChatPanelProps {
   id?: string
@@ -38,8 +39,12 @@ export function ChatPanel({
   const [visibleBottomRowIndex, setVisibleBottomRowIndex] = React.useState(2)
 
   // Track the messages currently displayed in the top and bottom rows
-  const [displayedTopMessages, setDisplayedTopMessages] = React.useState<any[]>([])
-  const [displayedBottomMessages, setDisplayedBottomMessages] = React.useState<any[]>([])
+  const [displayedTopMessages, setDisplayedTopMessages] = React.useState<any[]>(
+    []
+  )
+  const [displayedBottomMessages, setDisplayedBottomMessages] = React.useState<
+    any[]
+  >([])
 
   // Example messages (CTAs) placeholder
   const exampleMessages = [
@@ -143,10 +148,13 @@ export function ChatPanel({
 
   // Function to update the top row messages
   const updateTopRow = () => {
-    setDisplayedTopMessages((prevMessages) => {
+    setDisplayedTopMessages(prevMessages => {
       // Exclude the currently displayed messages in the bottom row
       const availableMessages = exampleMessages.filter(
-        (msg) => !displayedBottomMessages.some((bottomMsg) => bottomMsg.heading === msg.heading)
+        msg =>
+          !displayedBottomMessages.some(
+            bottomMsg => bottomMsg.heading === msg.heading
+          )
       )
       return availableMessages.sort(() => 0.5 - Math.random()).slice(0, 2)
     })
@@ -154,10 +162,11 @@ export function ChatPanel({
 
   // Function to update the bottom row messages
   const updateBottomRow = () => {
-    setDisplayedBottomMessages((prevMessages) => {
+    setDisplayedBottomMessages(prevMessages => {
       // Exclude the currently displayed messages in the top row
       const availableMessages = exampleMessages.filter(
-        (msg) => !displayedTopMessages.some((topMsg) => topMsg.heading === msg.heading)
+        msg =>
+          !displayedTopMessages.some(topMsg => topMsg.heading === msg.heading)
       )
       return availableMessages.sort(() => 0.5 - Math.random()).slice(0, 2)
     })
@@ -183,66 +192,74 @@ export function ChatPanel({
       />
 
       <div className="mx-auto sm:max-w-2xl sm:px-4">
-      {messages.length === 0 && (
-        <div className="mb-4 grid grid-cols-2 gap-2 px-4 sm:px-0">
-          {/* Render top row messages */}
-          {displayedTopMessages.map((example, index) => (
-            <div
-              key={example.heading}
-              className="cursor-pointer rounded-lg border bg-white p-4 hover:bg-zinc-50 dark:bg-zinc-950 dark:hover:bg-zinc-900"
-              onClick={async () => {
-                setMessages(currentMessages => [
-                  ...currentMessages,
-                  {
-                    id: nanoid(),
-                    display: <UserMessage>{example.message}</UserMessage>
-                  }
-                ])
+        {messages.length === 0 && (
+          <div className="mb-4 grid grid-cols-2 gap-2 px-4 sm:px-0">
+            {/* Render top row messages */}
+            {displayedTopMessages.map((example, index) => (
+              <div
+                key={example.heading}
+                className="cursor-pointer rounded-lg border bg-white p-4 hover:bg-zinc-50 dark:bg-zinc-950 dark:hover:bg-zinc-900"
+                onClick={async () => {
+                  setMessages(currentMessages => [
+                    ...currentMessages,
+                    {
+                      id: nanoid(),
+                      display: <UserMessage>{example.message}</UserMessage>
+                    }
+                  ])
 
-                const responseMessage = await submitUserMessage(example.message)
+                  const responseMessage = await submitUserMessage(
+                    example.message
+                  )
 
-                setMessages(currentMessages => [
-                  ...currentMessages,
-                  responseMessage
-                ])
-              }}
-            >
-              <div className="transition-opacity duration-500 opacity-100">
-                <div className="text-sm font-semibold">{example.heading}</div>
-                <div className="text-sm text-zinc-600">{example.subheading}</div>
+                  setMessages(currentMessages => [
+                    ...currentMessages,
+                    responseMessage
+                  ])
+                }}
+              >
+                <div className="transition-opacity duration-500 opacity-100">
+                  <div className="text-sm font-semibold">{example.heading}</div>
+                  <div className="text-sm text-zinc-600">
+                    {example.subheading}
+                  </div>
+                </div>
               </div>
-            </div>
-          ))}
+            ))}
 
-          {/* Render bottom row messages */}
-          {displayedBottomMessages.map((example, index) => (
-            <div
-              key={example.heading}
-              className="cursor-pointer rounded-lg border bg-white p-4 hover:bg-zinc-50 dark:bg-zinc-950 dark:hover:bg-zinc-900"
-              onClick={async () => {
-                setMessages(currentMessages => [
-                  ...currentMessages,
-                  {
-                    id: nanoid(),
-                    display: <UserMessage>{example.message}</UserMessage>
-                  }
-                ])
+            {/* Render bottom row messages */}
+            {displayedBottomMessages.map((example, index) => (
+              <div
+                key={example.heading}
+                className="cursor-pointer rounded-lg border bg-white p-4 hover:bg-zinc-50 dark:bg-zinc-950 dark:hover:bg-zinc-900"
+                onClick={async () => {
+                  setMessages(currentMessages => [
+                    ...currentMessages,
+                    {
+                      id: nanoid(),
+                      display: <UserMessage>{example.message}</UserMessage>
+                    }
+                  ])
 
-                const responseMessage = await submitUserMessage(example.message)
+                  const responseMessage = await submitUserMessage(
+                    example.message
+                  )
 
-                setMessages(currentMessages => [
-                  ...currentMessages,
-                  responseMessage
-                ])
-              }}
-            >
-              <div className="transition-opacity duration-500 opacity-100">
-                <div className="text-sm font-semibold">{example.heading}</div>
-                <div className="text-sm text-zinc-600">{example.subheading}</div>
+                  setMessages(currentMessages => [
+                    ...currentMessages,
+                    responseMessage
+                  ])
+                }}
+              >
+                <div className="transition-opacity duration-500 opacity-100">
+                  <div className="text-sm font-semibold">{example.heading}</div>
+                  <div className="text-sm text-zinc-600">
+                    {example.subheading}
+                  </div>
+                </div>
               </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
         )}
         {messages?.length >= 2 ? (
           <div className="flex h-12 items-center justify-center">
@@ -277,7 +294,6 @@ export function ChatPanel({
           <PromptForm input={input} setInput={setInput} />
           <FooterText className="hidden sm:block" />
         </div>
-      
       </div>
     </div>
   )
