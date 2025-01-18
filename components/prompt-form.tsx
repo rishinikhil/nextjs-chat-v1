@@ -1,9 +1,7 @@
 'use client'
 import * as React from 'react'
 import Textarea from 'react-textarea-autosize'
-
 import { useActions, useUIState } from 'ai/rsc'
-
 import { UserMessage } from './stocks/message'
 import { type AI } from '@/lib/chat/actions'
 import { Button } from '@/components/ui/button'
@@ -30,16 +28,43 @@ export function PromptForm({
   const inputRef = React.useRef<HTMLTextAreaElement>(null)
   const { submitUserMessage } = useActions()
   const [_, setMessages] = useUIState<typeof AI>()
-  const { message, setMessage } = useMessageStore() // Use Zustand store actions
+  const { message, setMessage } = useMessageStore()
+  const processingMessage = React.useRef(false)
 
+  // Function to handle message submission
+  const handleMessageSubmission = async (messageText: string) => {
+    if (!messageText.trim() || processingMessage.current) return
+
+    processingMessage.current = true
+    try {
+      // Optimistically add user message UI
+      setMessages(currentMessages => [
+        ...currentMessages,
+        {
+          id: nanoid(),
+          display: <UserMessage>{messageText}</UserMessage>
+        }
+      ])
+
+      // Submit and get response message
+      const responseMessage = await submitUserMessage(messageText)
+      setMessages(currentMessages => [...currentMessages, responseMessage])
+    } finally {
+      processingMessage.current = false
+    }
+  }
+
+  // Handle Zustand store messages
   React.useEffect(() => {
-    if (inputRef.current) {
-      inputRef.current.focus()
+    const processStoreMessage = async () => {
+      if (message && !processingMessage.current) {
+        await handleMessageSubmission(message)
+        setMessage('') // Clear the Zustand store's message
+      }
     }
-    if (message) {
-      setInput(message) // Set the input value from the store on load
-    }
-  }, [message, setInput])
+
+    processStoreMessage()
+  }, [message, setMessage])
 
   return (
     <form
@@ -53,24 +78,10 @@ export function PromptForm({
         }
 
         const value = input.trim()
-        if (!value) return
+        if (!value || processingMessage.current) return
 
-        // Optimistically add user message UI
-        setMessages(currentMessages => [
-          ...currentMessages,
-          {
-            id: nanoid(),
-            display: <UserMessage>{value}</UserMessage>
-          }
-        ])
-
-        // Submit and get response message
-        const responseMessage = await submitUserMessage(value)
-        setMessages(currentMessages => [...currentMessages, responseMessage])
-
-        // Clear input and reset context
-        setInput('')
-        setMessage('') // Clear the Zustand store's `message`
+        await handleMessageSubmission(value)
+        setInput('') // Clear input field
       }}
     >
       <div className="relative flex max-h-60 w-full grow flex-col overflow-hidden bg-background px-8 sm:rounded-md sm:border sm:px-12">
@@ -103,12 +114,16 @@ export function PromptForm({
           name="message"
           rows={1}
           value={input}
-          onChange={e => setInput(e.target.value)} // Update input state directly
+          onChange={e => setInput(e.target.value)}
         />
         <div className="absolute right-0 top-[13px] sm:right-4">
           <Tooltip>
             <TooltipTrigger asChild>
-              <Button type="submit" size="icon" disabled={input === ''}>
+              <Button
+                type="submit"
+                size="icon"
+                disabled={input === '' || processingMessage.current}
+              >
                 <IconArrowElbow />
                 <span className="sr-only">Send message</span>
               </Button>
