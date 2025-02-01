@@ -60,8 +60,8 @@ const SearchPage: React.FC = () => {
   const presetItems = [
     {
       icon: Compass,
-      text: currentLanguage === 'hi' ? 'बाजार' : 'Marketplace',
-      route: '/marketplace'
+      text: currentLanguage === 'hi' ? 'सफलता की कहानियाँ' : 'Success Stories',
+      route: '/successStories'
     },
     {
       icon: Compass,
@@ -73,7 +73,7 @@ const SearchPage: React.FC = () => {
     },
     {
       icon: Search,
-      text: currentLanguage === 'hi' ? 'चैट अब' : 'ChatNow',
+      text: currentLanguage === 'hi' ? 'बायोगैस GPT' : ' BioGas GPT',
       route: '/chats'
     },
     {
@@ -225,7 +225,7 @@ const SearchPage: React.FC = () => {
                 initial={{ opacity: 0, y: -20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5 }}
-                className="text-4xl md:text-5xl font-bold mb-12 text-center"
+                className="text-4xl md:text-5xl font-bold text-center mb-2"
               >
                 <span className="text-[#318832]">
                   {currentTranslations.title.part1}
@@ -234,6 +234,14 @@ const SearchPage: React.FC = () => {
                   {currentTranslations.title.part2}
                 </span>
               </motion.h1>
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5 }}
+                className=" text-center text-sm md:text-md font-bold text-black mb-6"
+              >
+                {currentTranslations.title.part3}
+              </motion.div>
 
               <motion.div
                 ref={searchRef}
@@ -398,16 +406,23 @@ const SearchPage: React.FC = () => {
               <div className="flex flex-wrap gap-6 justify-between text-gray-700">
                 <div className="flex flex-wrap gap-6">
                   <Link
-                    href="/marketplace"
-                    className="hover:underline hover:text-blue-500 transition-colors"
-                  >
-                    {currentTranslations.footerLinks.marketplace}
-                  </Link>
-                  <Link
                     href="/monitoringsystem"
                     className="hover:underline hover:text-blue-500 transition-colors"
                   >
                     {currentTranslations.footerLinks.monitoring}
+                  </Link>
+                  <Link
+                    href="/patent"
+                    className="hover:underline hover:text-blue-500 transition-colors"
+                  >
+                    {currentTranslations.footerLinks.patent}
+                  </Link>
+
+                  <Link
+                    href="/successSotries"
+                    className="hover:underline hover:text-blue-500 transition-colors"
+                  >
+                    {currentTranslations.footerLinks.successStories}
                   </Link>
                   <Link
                     href="/chats"
@@ -429,12 +444,7 @@ const SearchPage: React.FC = () => {
                   >
                     {currentTranslations.footerLinks.terms}
                   </Link>
-                  <Link
-                    href="/patent"
-                    className="hover:underline hover:text-blue-500 transition-colors"
-                  >
-                    {currentTranslations.footerLinks.patent}
-                  </Link>
+
                   <Link
                     href="/copyright"
                     className="hover:underline hover:text-blue-500 transition-colors"

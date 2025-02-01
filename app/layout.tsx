@@ -23,7 +23,7 @@ export const metadata = {
     : undefined,
   title: {
     default: 'BioSarthi',
-    template: `BioSarthi - Biogas AI`
+    template: `BioSarthi - BioGas GPT`
   },
   description: 'Empowering Biogas Ecosystem with Data and AI',
   icons: {

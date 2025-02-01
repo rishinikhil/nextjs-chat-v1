@@ -29,17 +29,6 @@ async function UserOrLogin({ isLogo }: { isLogo?: boolean }) {
     console.error('Authentication error:', error)
   }
 
-  // Always render the logo
-  const logo = (
-    <Link href="/new" rel="nofollow">
-      <img
-        src="/biosarthi-logo.png"
-        alt="BioSarthi Logo"
-        className={`h-7 w-auto ${isLogo ? 'ml-4' : ''}`}
-      />
-    </Link>
-  )
-
   if (isLogo) {
     return session?.user ? (
       <>
@@ -47,7 +36,7 @@ async function UserOrLogin({ isLogo }: { isLogo?: boolean }) {
           <ChatHistory userId={session.user.id} />
         </SidebarMobile>
         <SidebarToggle />
-        <Link href="/new" rel="nofollow">
+        <Link href="/" rel="nofollow">
           <img
             src="/biosarthi-logo.png"
             alt="BioSarthi Logo"
@@ -56,7 +45,7 @@ async function UserOrLogin({ isLogo }: { isLogo?: boolean }) {
         </Link>
       </>
     ) : (
-      <Link href="/new" rel="nofollow">
+      <Link href="/" rel="nofollow">
         <img
           src="/biosarthi-logo.png"
           alt="BioSarthi Logo"
