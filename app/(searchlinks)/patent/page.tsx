@@ -2,11 +2,14 @@
 import Image from 'next/image'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { ScrollText, Calendar, Users, CheckCircle2 } from 'lucide-react'
+import { ScrollText, Calendar, CheckCircle2 } from 'lucide-react'
 import useLanguageStore from '@/app/store/useLanguageStore'
+import AnimatedFooter from '@/components/animatedFooter'
+
 export default function PatentsPage() {
   const { currentLanguage, translations } = useLanguageStore()
   const patentsData = translations[currentLanguage].patentsData
+
   return (
     <div className="min-h-screen bg-white p-6 md:p-8">
       <div className="mx-auto max-w-6xl space-y-8">
@@ -32,15 +35,15 @@ export default function PatentsPage() {
             >
               <CardContent className="p-0">
                 <div className="grid md:grid-cols-2">
-                  <div className="relative h-[800px]">
+                  <div className="relative h-[35vw] w-full">
                     <Image
                       src={'/bioSarthiPatent.png'}
                       alt={patent.title}
                       fill
-                      className="object-cover"
+                      className="object-contain"
                     />
                   </div>
-                  <div className="p-6 space-y-6 ">
+                  <div className="p-6 space-y-6">
                     <div className="space-y-4">
                       <div className="flex items-center justify-between">
                         <h2 className="text-2xl font-semibold">
@@ -86,6 +89,7 @@ export default function PatentsPage() {
             </Card>
           ))}
         </div>
+        <AnimatedFooter />
       </div>
     </div>
   )

@@ -79,10 +79,26 @@ interface LanguageState {
           features: string[]
         }[]
       }
+      monitoringData: {
+        title: {
+          firstPart: string
+          secondPart: string
+        }
+        introduction: string
+        headers: string[]
+        rows: string[][]
+      }
+      copyrightData: {
+        title: string
+        content: string
+        sections: {
+          heading: string
+          text: string
+        }[]
+      }
     }
   }
 }
-
 const useLanguageStore = create<LanguageState>(set => ({
   currentLanguage: 'en',
   setLanguage: language => set({ currentLanguage: language }),
@@ -188,6 +204,133 @@ const useLanguageStore = create<LanguageState>(set => ({
             ]
           }
         ]
+      },
+      monitoringData: {
+        title: {
+          firstPart: 'BioSarthi®',
+          secondPart: 'Monitoring System Comparison'
+        },
+        introduction:
+          'Compare the BioSarthi® Monitoring System with other available solutions to understand its advantages and benefits.',
+        headers: [
+          'Parameter',
+          'BioSarthi Monitoring System For Biogas Plants',
+          'BioSarthi Monitoring System For CBG Plants',
+          'Other Monitoring Systems'
+        ],
+        rows: [
+          [
+            'Flow Meter Technology',
+            'Ultrasonic (±1.5% precision)',
+            'Connects with existing flow meters',
+            'Varies: Differential, Electromagnetic, Thermal Mass (±1.5% to ±7%)'
+          ],
+          [
+            'Pressure & Temperature Sensitivity',
+            'Low, real-time data',
+            'High, connects with existing sensors',
+            'Medium to High, delayed data'
+          ],
+          [
+            'Data Transmission',
+            '4G, real-time cloud-based',
+            '4G, real-time cloud-based',
+            'Local, periodic updates'
+          ],
+          [
+            'Power Source',
+            'Solar with robust backup',
+            'Solar with robust backup, connects with inhouse power source as well',
+            'Solar, often needs external power'
+          ],
+          [
+            'Filtration System',
+            'Included, low-cost',
+            'Connects with PLC of existing purification system',
+            'Requires separate purchase'
+          ],
+          [
+            'Data Storage & Backup',
+            'Cloud-based with backup',
+            'Cloud-based with backup',
+            'Local storage, limited backup'
+          ],
+          [
+            'Maintenance & Support',
+            'Automated alerts, comprehensive',
+            'Automated alerts, comprehensive',
+            'Manual alerts, limited support'
+          ],
+          [
+            'Data Security',
+            'Strong encryption, secure cloud',
+            'Strong encryption, secure cloud',
+            'Basic security, potential vulnerabilities'
+          ],
+          [
+            'Integration with Control Systems',
+            'Seamless with PLC and SCADA',
+            'Seamless with PLC and SCADA',
+            'Basic to moderate integration'
+          ],
+          [
+            'Cost-Effectiveness',
+            'Low cost, high value',
+            'Low cost, high value',
+            'High cost'
+          ],
+          [
+            'Long-Term Benefit',
+            'High, durable components',
+            'High, durable components',
+            'Medium, with more frequent replacements'
+          ],
+          [
+            'Warranty & Reliability',
+            'Comprehensive warranty, high reliability',
+            'Comprehensive warranty, high reliability',
+            'Limited warranty, varied reliability'
+          ],
+          [
+            'Training & Onboarding',
+            'Extensive documentation and training content available',
+            'Extensive documentation and training content available',
+            'Basic, limited training resources'
+          ],
+          [
+            'Scalability',
+            'Easily scalable, supports multiple plants',
+            'Easily scalable, supports multiple flow meters, gas analysers, multiple PLCs, SCADA systems as well as analog devices',
+            'Varies: Differential, Electromagnetic, Thermal Mass (±1.5% to ±7%)'
+          ]
+        ]
+      },
+      copyrightData: {
+        title: 'Terms of Use & Disclaimer',
+        content:
+          'BioSarthi® AI Engine, developed by CGF BioEnergy Pvt. Ltd., is provided for informational purposes only. By using this service, you agree to these Terms of Use and Disclaimer. CGF BioEnergy Pvt. Ltd. is not liable for any decisions or actions taken based on AI-generated responses. The company does not guarantee the accuracy or completeness of the information provided. The information shared should not be considered as professional advice. Please consult a professional for technical, financial, or legal matters. All trademarks, logos, and content are the intellectual property of CGF BioEnergy Pvt. Ltd. We reserve the right to modify these terms at any time without prior notice. By using BioSarthi® AI Engine, you consent to these terms and agree to the disclaimers mentioned above. For any questions or concerns, please contact us at hello[at]biosarthi.com.',
+        sections: [
+          {
+            heading: 'Intellectual Property Rights',
+            text: 'All content, including text, graphics, logos, and software, is owned by CGF BioEnergy Pvt. Ltd. and is protected under applicable copyright laws.'
+          },
+          {
+            heading: 'Usage Restrictions',
+            text: 'You may not copy, reproduce, distribute, or modify any part of the BioSarthi® AI Engine without prior written consent from CGF BioEnergy Pvt. Ltd.'
+          },
+          {
+            heading: 'Limitation of Liability',
+            text: 'We do not assume responsibility for any inaccuracies, omissions, or reliance on the information provided. The use of our AI Engine is at your own risk.'
+          },
+          {
+            heading: 'Third-Party Links & Services',
+            text: 'Our platform may contain links to third-party services or websites. We are not responsible for the content or policies of these external sources.'
+          },
+          {
+            heading: 'Changes & Updates',
+            text: 'CGF BioEnergy Pvt. Ltd. reserves the right to update or modify these terms at any time. Users are encouraged to review this page periodically.'
+          }
+        ]
       }
     },
     hi: {
@@ -289,6 +432,133 @@ const useLanguageStore = create<LanguageState>(set => ({
               'संचालन अनुकूलन के लिए उन्नत विश्लेषण',
               'पूर्वानुमानित रखरखाव क्षमताएं'
             ]
+          }
+        ]
+      },
+      monitoringData: {
+        title: {
+          firstPart: 'BioSarthi®',
+          secondPart: 'मॉनिटरिंग सिस्टम तुलना'
+        },
+        introduction:
+          'अन्य उपलब्ध समाधानों की तुलना में BioSarthi® मॉनिटरिंग सिस्टम के लाभों और विशेषताओं को समझें।',
+        headers: [
+          'पैरामीटर',
+          'बायोसार्थी मॉनिटरिंग सिस्टम बायोगैस प्लांट्स के लिए',
+          'बायोसार्थी मॉनिटरिंग सिस्टम CBG प्लांट्स के लिए',
+          'अन्य मॉनिटरिंग सिस्टम'
+        ],
+        rows: [
+          [
+            'फ्लो मीटर टेक्नोलॉजी',
+            'अल्ट्रासोनिक (±1.5% सटीकता)',
+            'मौजूदा फ्लो मीटर से कनेक्ट होता है',
+            'विभिन्न प्रकार: डिफरेंशियल, इलेक्ट्रोमैग्नेटिक, थर्मल मास (±1.5% से ±7%)'
+          ],
+          [
+            'दबाव और तापमान संवेदनशीलता',
+            'कम, वास्तविक समय डेटा',
+            'उच्च, मौजूदा सेंसर से कनेक्ट होता है',
+            'मध्यम से उच्च, विलंबित डेटा'
+          ],
+          [
+            'डेटा ट्रांसमिशन',
+            '4G, वास्तविक समय क्लाउड-आधारित',
+            '4G, वास्तविक समय क्लाउड-आधारित',
+            'स्थानीय, आवधिक अपडेट'
+          ],
+          [
+            'पावर स्रोत',
+            'सौर ऊर्जा के साथ मजबूत बैकअप',
+            'सौर ऊर्जा के साथ मजबूत बैकअप, इनहाउस पावर स्रोत से भी कनेक्ट होता है',
+            'सौर ऊर्जा, अक्सर बाहरी पावर की आवश्यकता होती है'
+          ],
+          [
+            'फिल्टरेशन सिस्टम',
+            'शामिल, कम लागत',
+            'मौजूदा शुद्धिकरण प्रणाली के PLC से कनेक्ट होता है',
+            'अलग से खरीदना आवश्यक'
+          ],
+          [
+            'डेटा स्टोरेज और बैकअप',
+            'क्लाउड-आधारित बैकअप के साथ',
+            'क्लाउड-आधारित बैकअप के साथ',
+            'स्थानीय स्टोरेज, सीमित बैकअप'
+          ],
+          [
+            'रखरखाव और समर्थन',
+            'स्वचालित अलर्ट, व्यापक',
+            'स्वचालित अलर्ट, व्यापक',
+            'मैनुअल अलर्ट, सीमित समर्थन'
+          ],
+          [
+            'डेटा सुरक्षा',
+            'मजबूत एन्क्रिप्शन, सुरक्षित क्लाउड',
+            'मजबूत एन्क्रिप्शन, सुरक्षित क्लाउड',
+            'मूलभूत सुरक्षा, संभावित कमजोरियां'
+          ],
+          [
+            'नियंत्रण प्रणालियों के साथ एकीकरण',
+            'PLC और SCADA के साथ सहज',
+            'PLC और SCADA के साथ सहज',
+            'मूल से मध्यम एकीकरण'
+          ],
+          [
+            'लागत प्रभावशीलता',
+            'कम लागत, उच्च मूल्य',
+            'कम लागत, उच्च मूल्य',
+            'उच्च लागत'
+          ],
+          [
+            'दीर्घकालिक लाभ',
+            'उच्च, टिकाऊ घटक',
+            'उच्च, टिकाऊ घटक',
+            'मध्यम, बार-बार प्रतिस्थापन की आवश्यकता'
+          ],
+          [
+            'वारंटी और विश्वसनीयता',
+            'व्यापक वारंटी, उच्च विश्वसनीयता',
+            'व्यापक वारंटी, उच्च विश्वसनीयता',
+            'सीमित वारंटी, विविध विश्वसनीयता'
+          ],
+          [
+            'प्रशिक्षण और ऑनबोर्डिंग',
+            'व्यापक दस्तावेज़ और प्रशिक्षण सामग्री उपलब्ध',
+            'व्यापक दस्तावेज़ और प्रशिक्षण सामग्री उपलब्ध',
+            'मूलभूत, सीमित प्रशिक्षण संसाधन'
+          ],
+          [
+            'विस्तार योग्यता',
+            'आसानी से स्केलेबल, कई प्लांट्स का समर्थन करता है',
+            'आसानी से स्केलेबल, कई फ्लो मीटर, गैस विश्लेषक, कई PLCs, SCADA सिस्टम और एनालॉग डिवाइसेस का समर्थन करता है',
+            'विभिन्न प्रकार: डिफरेंशियल, इलेक्ट्रोमैग्नेटिक, थर्मल मास (±1.5% से ±7%)'
+          ]
+        ]
+      },
+      copyrightData: {
+        title: 'उपयोग की शर्तें और अस्वीकरण',
+        content:
+          'BioSarthi® AI Engine, CGF BioEnergy Pvt. Ltd. द्वारा विकसित, केवल सूचना उद्देश्यों के लिए प्रदान किया गया है। इस सेवा का उपयोग करके, आप इन उपयोग की शर्तों और अस्वीकरण से सहमत होते हैं। CGF BioEnergy Pvt. Ltd. AI-जनित प्रतिक्रियाओं के आधार पर लिए गए निर्णयों या कार्यों के लिए उत्तरदायी नहीं है। कंपनी प्रदान की गई जानकारी की सटीकता या पूर्णता की गारंटी नहीं देती है। यह जानकारी पेशेवर सलाह के रूप में नहीं मानी जानी चाहिए। कृपया तकनीकी, वित्तीय या कानूनी मामलों के लिए किसी विशेषज्ञ से परामर्श करें। सभी ट्रेडमार्क, लोगो और सामग्री CGF BioEnergy Pvt. Ltd. की बौद्धिक संपत्ति हैं।',
+        sections: [
+          {
+            heading: 'बौद्धिक संपत्ति अधिकार',
+            text: 'सभी सामग्री, जिसमें पाठ, ग्राफिक्स, लोगो और सॉफ्टवेयर शामिल हैं, CGF BioEnergy Pvt. Ltd. के स्वामित्व में है और लागू कॉपीराइट कानूनों के तहत संरक्षित है।'
+          },
+          {
+            heading: 'उपयोग प्रतिबंध',
+            text: 'आप CGF BioEnergy Pvt. Ltd. की पूर्व लिखित अनुमति के बिना BioSarthi® एआई इंजन के किसी भी भाग की प्रतिलिपि, पुनरुत्पादन, वितरण या संशोधन नहीं कर सकते।'
+          },
+          {
+            heading: 'दायित्व की सीमा',
+            text: 'हम किसी भी अशुद्धियों, चूकों, या प्रदान की गई जानकारी पर निर्भरता के लिए जिम्मेदार नहीं हैं। हमारे एआई इंजन का उपयोग आपकी अपनी जोखिम पर है।'
+          },
+          {
+            heading: 'तृतीय-पक्ष लिंक और सेवाएं',
+            text: 'हमारे प्लेटफॉर्म में तृतीय-पक्ष सेवाओं या वेबसाइटों के लिंक हो सकते हैं। हम इन बाहरी स्रोतों की सामग्री या नीतियों के लिए उत्तरदायी नहीं हैं।'
+          },
+          {
+            heading: 'परिवर्तन और अपडेट',
+            text: 'CGF BioEnergy Pvt. Ltd. किसी भी समय इन शर्तों को अपडेट या संशोधित करने का अधिकार सुरक्षित रखता है। उपयोगकर्ताओं को समय-समय पर इस पृष्ठ की समीक्षा करने की सलाह दी जाती है।'
           }
         ]
       }

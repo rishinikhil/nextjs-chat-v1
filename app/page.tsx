@@ -10,6 +10,7 @@ import { MovingBorder } from '@/components/ui/moving-border'
 import useLanguageStore from './store/useLanguageStore'
 import { useRouter } from 'next/navigation'
 import useMessageStore from './store/useMessageStore'
+import AnimatedFooter from '@/components/animatedFooter'
 
 // Type definitions for Speech Recognition
 interface IWindow extends Window {
@@ -395,68 +396,9 @@ const SearchPage: React.FC = () => {
               </motion.div>
             </div>
           </div>
-
-          <motion.footer
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.8 }}
-            className="w-full bg-white/60 backdrop-blur-sm border-t border-gray-200"
-          >
-            <div className="w-full mx-auto px-4 py-3">
-              <div className="flex flex-wrap gap-6 justify-between text-gray-700">
-                <div className="flex flex-wrap gap-6">
-                  <Link
-                    href="/monitoringsystem"
-                    className="hover:underline hover:text-blue-500 transition-colors"
-                  >
-                    {currentTranslations.footerLinks.monitoring}
-                  </Link>
-                  <Link
-                    href="/patent"
-                    className="hover:underline hover:text-blue-500 transition-colors"
-                  >
-                    {currentTranslations.footerLinks.patent}
-                  </Link>
-
-                  <Link
-                    href="/successSotries"
-                    className="hover:underline hover:text-blue-500 transition-colors"
-                  >
-                    {currentTranslations.footerLinks.successStories}
-                  </Link>
-                  <Link
-                    href="/chats"
-                    className="hover:underline hover:text-blue-500 transition-colors"
-                  >
-                    {currentTranslations.footerLinks.chat}
-                  </Link>
-                </div>
-                <div className="flex flex-wrap gap-6">
-                  <Link
-                    href="/privacy"
-                    className="hover:underline hover:text-blue-500 transition-colors"
-                  >
-                    {currentTranslations.footerLinks.privacy}
-                  </Link>
-                  <Link
-                    href="/terms"
-                    className="hover:underline hover:text-blue-500 transition-colors"
-                  >
-                    {currentTranslations.footerLinks.terms}
-                  </Link>
-
-                  <Link
-                    href="/copyright"
-                    className="hover:underline hover:text-blue-500 transition-colors"
-                  >
-                    {currentTranslations.footerLinks.copyright}
-                  </Link>
-                </div>
-              </div>
-            </div>
-          </motion.footer>
         </div>
       </GridSmallBackgroundDemo>
+      <AnimatedFooter />
     </div>
   )
 }

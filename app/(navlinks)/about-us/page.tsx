@@ -2,7 +2,23 @@
 import React from 'react'
 import { motion } from 'framer-motion'
 import Link from 'next/link'
+import Image from 'next/image'
 import useLanguageStore from '@/app/store/useLanguageStore'
+import { Badge } from '@/components/ui/badge' // Assuming Badge component exists
+import AnimatedFooter from '@/components/animatedFooter'
+
+const staggerChildren = {
+  initial: { opacity: 0 },
+  animate: {
+    opacity: 1,
+    transition: { staggerChildren: 0.2 }
+  }
+}
+
+const fadeIn = {
+  initial: { opacity: 0, y: 20 },
+  animate: { opacity: 1, y: 0, transition: { duration: 0.5 } }
+}
 
 const AboutUs = () => {
   const { currentLanguage, translations } = useLanguageStore()
@@ -25,7 +41,7 @@ const AboutUs = () => {
             {content.aboutUs.title.part1}{' '}
           </span>{' '}
           <span style={{ color: '#DD2E29' }}>
-            {content.aboutUs.title.part2}{' '}
+            {content.aboutUs.title.part2}
           </span>
         </motion.h1>
         <motion.p
@@ -34,7 +50,7 @@ const AboutUs = () => {
           transition={{ delay: 0.2 }}
           className="text-gray-600 text-center"
         >
-          {content.aboutUs.title.subtitle}{' '}
+          {content.aboutUs.title.subtitle}
         </motion.p>
       </motion.div>
 
@@ -78,57 +94,71 @@ const AboutUs = () => {
             </div>
           ))}
         </div>
+
+        <motion.section
+          className="space-y-12 mb-24"
+          variants={staggerChildren}
+          initial="initial"
+          whileInView="animate"
+          viewport={{ once: true }}
+        >
+          <h2 className="text-3xl font-bold text-center">Our Recognition</h2>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+            <motion.div className="text-center space-y-4" variants={fadeIn}>
+              <div className="bg-gray-50 p-6 rounded-lg h-32 flex items-center justify-center">
+                <Link href={'/patent'} className="hover:underline">
+                  <Image
+                    src="/bioSarthiPatent.png"
+                    alt="patent@BioSarthi"
+                    width={160}
+                    height={80}
+                    className="object-contain"
+                  />
+                </Link>
+              </div>
+              <p className="font-medium">Patented Technology</p>
+            </motion.div>
+            <motion.div className="text-center space-y-4" variants={fadeIn}>
+              <div className="bg-gray-50 p-6 rounded-lg h-32 flex items-center justify-center">
+                <Image
+                  src="/nasscom.png"
+                  alt="NASSCOM"
+                  width={160}
+                  height={80}
+                  className="object-contain"
+                />
+              </div>
+              <p className="font-medium">NASSCOM CoE Incubated</p>
+            </motion.div>
+            <motion.div className="text-center space-y-4" variants={fadeIn}>
+              <div className="bg-gray-50 p-6 rounded-lg h-32 flex items-center justify-center">
+                <Image
+                  src="/startUpIndia.png"
+                  alt="DPIIT"
+                  width={160}
+                  height={80}
+                  className="object-contain"
+                />
+              </div>
+              <p className="font-medium">DPIIT Recognized</p>
+            </motion.div>
+            <motion.div className="text-center space-y-4" variants={fadeIn}>
+              <div className="bg-gray-50 p-6 rounded-lg h-32 flex items-center justify-center">
+                <Image
+                  src="/JpalCerti.png"
+                  alt="JPAL"
+                  width={160}
+                  height={80}
+                  className="object-contain"
+                />
+              </div>
+              <p className="font-medium">Supported by JPAL</p>
+            </motion.div>
+          </div>
+        </motion.section>
       </motion.div>
 
-      <motion.footer
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.8 }}
-        className="bg-gray-100 border-t border-gray-200 w-full"
-      >
-        <div className="px-6 py-3 flex justify-between text-gray-600">
-          <div className="flex space-x-6">
-            <Link
-              href="/marketplace"
-              className="hover:underline hover:text-blue-500"
-            >
-              {content.footerLinks.successStories}
-            </Link>
-            <Link
-              href="/monitoringsystem"
-              className="hover:underline hover:text-blue-500"
-            >
-              {content.footerLinks.monitoring}
-            </Link>
-            <Link href="/chats" className="hover:underline hover:text-blue-500">
-              {content.footerLinks.chat}
-            </Link>
-          </div>
-          <div className="flex space-x-6">
-            <Link
-              href="/privacy"
-              className="hover:underline hover:text-blue-500"
-            >
-              {content.footerLinks.privacy}
-            </Link>
-            <Link href="/terms" className="hover:underline hover:text-blue-500">
-              {content.footerLinks.terms}
-            </Link>
-            <Link
-              href="/patent"
-              className="hover:underline hover:text-blue-500"
-            >
-              {content.footerLinks.patent}
-            </Link>
-            <Link
-              href="/copyright"
-              className="hover:underline hover:text-blue-500"
-            >
-              {content.footerLinks.copyright}
-            </Link>
-          </div>
-        </div>
-      </motion.footer>
+      <AnimatedFooter />
     </div>
   )
 }
