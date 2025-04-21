@@ -38,7 +38,7 @@ export default async function ChatPage({ params }: ChatPageProps) {
   const missingKeys = await getMissingKeys()
 
   if (!session?.user) {
-    redirect(`/login?next=/chat/${params.id}`)
+    redirect(`/login?next=/chats/chat/${params.id}`)
   }
 
   const userId = session.user.id as string
@@ -48,6 +48,7 @@ export default async function ChatPage({ params }: ChatPageProps) {
     redirect('/')
   } else {
     if (chat?.userId !== session?.user?.id) {
+      console.log('qTHis function is in working')
       notFound()
     }
 

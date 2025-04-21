@@ -1,10 +1,7 @@
 'use client'
-
 import * as React from 'react'
 import Textarea from 'react-textarea-autosize'
-
 import { useActions, useUIState } from 'ai/rsc'
-
 import { UserMessage } from './stocks/message'
 import { type AI } from '@/lib/chat/actions'
 import { Button } from '@/components/ui/button'
@@ -17,6 +14,7 @@ import {
 import { useEnterSubmit } from '@/lib/hooks/use-enter-submit'
 import { nanoid } from 'nanoid'
 import { useRouter } from 'next/navigation'
+import useMessageStore from '@/app/store/useMessageStore'
 
 export function PromptForm({
   input,
@@ -30,40 +28,60 @@ export function PromptForm({
   const inputRef = React.useRef<HTMLTextAreaElement>(null)
   const { submitUserMessage } = useActions()
   const [_, setMessages] = useUIState<typeof AI>()
+  const { message, setMessage } = useMessageStore()
+  const processingMessage = React.useRef(false)
 
-  React.useEffect(() => {
-    if (inputRef.current) {
-      inputRef.current.focus()
+  // Function to handle message submission
+  const handleMessageSubmission = async (messageText: string) => {
+    if (!messageText.trim() || processingMessage.current) return
+
+    processingMessage.current = true
+    try {
+      // Optimistically add user message UI
+      setMessages(currentMessages => [
+        ...currentMessages,
+        {
+          id: nanoid(),
+          display: <UserMessage>{messageText}</UserMessage>
+        }
+      ])
+
+      // Submit and get response message
+      const responseMessage = await submitUserMessage(messageText)
+      setMessages(currentMessages => [...currentMessages, responseMessage])
+    } finally {
+      processingMessage.current = false
     }
-  }, [])
+  }
+
+  // Handle Zustand store messages
+  React.useEffect(() => {
+    const processStoreMessage = async () => {
+      if (message && !processingMessage.current) {
+        await handleMessageSubmission(message)
+        setMessage('') // Clear the Zustand store's message
+      }
+    }
+
+    processStoreMessage()
+  }, [message, setMessage])
 
   return (
     <form
       ref={formRef}
-      onSubmit={async (e: any) => {
+      onSubmit={async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault()
 
         // Blur focus on mobile
         if (window.innerWidth < 600) {
-          e.target['message']?.blur()
+          e.currentTarget['message']?.blur()
         }
 
         const value = input.trim()
-        setInput('')
-        if (!value) return
+        if (!value || processingMessage.current) return
 
-        // Optimistically add user message UI
-        setMessages(currentMessages => [
-          ...currentMessages,
-          {
-            id: nanoid(),
-            display: <UserMessage>{value}</UserMessage>
-          }
-        ])
-
-        // Submit and get response message
-        const responseMessage = await submitUserMessage(value)
-        setMessages(currentMessages => [...currentMessages, responseMessage])
+        await handleMessageSubmission(value)
+        setInput('') // Clear input field
       }}
     >
       <div className="relative flex max-h-60 w-full grow flex-col overflow-hidden bg-background px-8 sm:rounded-md sm:border sm:px-12">
@@ -74,7 +92,7 @@ export function PromptForm({
               size="icon"
               className="absolute left-0 top-[14px] size-8 rounded-full bg-background p-0 sm:left-4"
               onClick={() => {
-                router.push('/new')
+                router.push('/chats')
               }}
             >
               <IconPlus />
@@ -101,7 +119,11 @@ export function PromptForm({
         <div className="absolute right-0 top-[13px] sm:right-4">
           <Tooltip>
             <TooltipTrigger asChild>
-              <Button type="submit" size="icon" disabled={input === ''}>
+              <Button
+                type="submit"
+                size="icon"
+                disabled={input === '' || processingMessage.current}
+              >
                 <IconArrowElbow />
                 <span className="sr-only">Send message</span>
               </Button>
