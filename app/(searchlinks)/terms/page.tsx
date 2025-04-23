@@ -1,7 +1,10 @@
 'use client'
+
 import { Card, CardContent } from '@/components/ui/card'
 import { ScrollText, Mail, Phone, MapPin } from 'lucide-react'
 import useLanguageStore from '@/app/store/useLanguageStore'
+
+export const dynamic = 'force-dynamic'
 
 export default function TermsAndConditions() {
   const { currentLanguage, translations } = useLanguageStore()

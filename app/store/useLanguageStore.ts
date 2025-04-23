@@ -79,13 +79,21 @@ interface LanguageState {
           features: string[]
         }[]
       }
+      PrivacyPolicy: {
+        title: string
+        sections: {
+          heading: string
+          content: string
+          list?: string[]
+        }[]
+      }
       monitoringData: {
         title: {
           firstPart: string
           secondPart: string
         }
         introduction: string
-        headers: string[]
+        headings: string[]
         rows: string[][]
       }
       copyrightData: {
@@ -205,6 +213,34 @@ const useLanguageStore = create<LanguageState>(set => ({
           }
         ]
       },
+      PrivacyPolicy: {
+        title: 'Privacy Policy',
+        sections: [
+          {
+            heading: 'Information We Collect',
+            content: 'At BioSarthi, we collect various types of information to provide and improve our services:',
+            list: [
+              'Personal identification information (Name, email address, phone number)',
+              'Usage data and analytics',
+              'Device and browser information',
+              'Biogas plant operational data',
+            ],
+          },
+          {
+            heading: 'How We Use Your Information',
+            content: 'Your information helps us provide and improve our services:',
+            list: [
+              'To provide and maintain our service',
+              'To notify you about changes to our service',
+              'To provide customer support',
+              'To gather analysis or valuable information',
+            ],
+          },
+          {
+            heading: 'Data Security',
+            content: 'We implement appropriate security measures to protect your personal information. However, no method of transmission over the Internet or electronic storage is 100% secure, and we cannot guarantee absolute security.',
+          },
+        ]},
       monitoringData: {
         title: {
           firstPart: 'BioSarthi®',
@@ -212,7 +248,7 @@ const useLanguageStore = create<LanguageState>(set => ({
         },
         introduction:
           'Compare the BioSarthi® Monitoring System with other available solutions to understand its advantages and benefits.',
-        headers: [
+        headings: [
           'Parameter',
           'BioSarthi Monitoring System For Biogas Plants',
           'BioSarthi Monitoring System For CBG Plants',
@@ -435,6 +471,34 @@ const useLanguageStore = create<LanguageState>(set => ({
           }
         ]
       },
+      PrivacyPolicy: {
+        title: 'गोपनीयता नीति',
+        sections: [
+          {
+            heading: 'हम जो जानकारी एकत्र करते हैं',
+            content: 'BioSarthi पर, हम अपनी सेवाओं को प्रदान करने और सुधारने के लिए विभिन्न प्रकार की जानकारी एकत्र करते हैं:',
+            list: [
+              'व्यक्तिगत पहचान जानकारी (नाम, ईमेल पता, फोन नंबर)',
+              'उपयोग डेटा और विश्लेषण',
+              'डिवाइस और ब्राउज़र जानकारी',
+              'बायोगैस संयंत्र संचालन डेटा',
+            ],
+          },
+          {
+            heading: 'हम आपकी जानकारी का उपयोग कैसे करते हैं',
+            content: 'आपकी जानकारी हमारी सेवाओं को प्रदान करने और सुधारने में मदद करती है:',
+            list: [
+              'अपनी सेवा प्रदान करने और बनाए रखने के लिए',
+              'हमारी सेवा में परिवर्तनों के बारे में आपको सूचित करने के लिए',
+              'ग्राहक सहायता प्रदान करने के लिए',
+              'विश्लेषण या मूल्यवान जानकारी एकत्र करने के लिए',
+            ],
+          },
+          {
+            heading: 'डेटा सुरक्षा',
+            content: 'हम आपकी व्यक्तिगत जानकारी की सुरक्षा के लिए उचित सुरक्षा उपाय लागू करते हैं। हालांकि, इंटरनेट के माध्यम से किसी भी तरीके से या इलेक्ट्रॉनिक भंडारण में 100% सुरक्षित नहीं है, और हम पूर्ण सुरक्षा की गारंटी नहीं दे सकते।',
+          },
+        ]},
       monitoringData: {
         title: {
           firstPart: 'BioSarthi®',
@@ -442,7 +506,7 @@ const useLanguageStore = create<LanguageState>(set => ({
         },
         introduction:
           'अन्य उपलब्ध समाधानों की तुलना में BioSarthi® मॉनिटरिंग सिस्टम के लाभों और विशेषताओं को समझें।',
-        headers: [
+        headings: [
           'पैरामीटर',
           'बायोसार्थी मॉनिटरिंग सिस्टम बायोगैस प्लांट्स के लिए',
           'बायोसार्थी मॉनिटरिंग सिस्टम CBG प्लांट्स के लिए',

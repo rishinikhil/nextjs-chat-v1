@@ -22,11 +22,7 @@ export function LoginButton({
   const handleLogin = async () => {
     setIsLoading(true)
     const result = await signIn('github', { callbackUrl: `/` })
-    // Check if the login was successful and handle accordingly
-    if (result?.error) {
-      // Handle error (e.g., show a message)
-      console.error('Login failed:', result.error)
-    }
+
     setIsLoading(false)
   }
 

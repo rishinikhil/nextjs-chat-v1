@@ -14,7 +14,6 @@ import AnimatedFooter from '@/components/animatedFooter'
 export default function MonitoringComparison() {
   const { currentLanguage, translations } = useLanguageStore()
   const monitoringData = translations[currentLanguage].monitoringData
-  const copyrightData = translations[currentLanguage].copyrightData
 
   return (
     <div className="min-h-screen bg-white p-6 md:p-8">
@@ -46,7 +45,7 @@ export default function MonitoringComparison() {
         <Table className="w-full border border-gray-200 shadow-lg">
           <TableHeader>
             <TableRow className="bg-green-700 text-white">
-              {monitoringData.headers.map((header, index) => (
+              {monitoringData.headings.map((header, index) => (
                 <TableHead key={index} className="p-4 text-white">
                   {header}
                 </TableHead>

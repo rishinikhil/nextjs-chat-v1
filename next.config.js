@@ -9,5 +9,7 @@ module.exports = {
         pathname: '**'
       }
     ]
-  }
+  },
+  reactStrictMode: true,
+  output: 'standalone' // Use this instead of 'export'
 }
