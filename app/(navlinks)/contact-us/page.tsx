@@ -5,6 +5,7 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
 import useLanguageStore from '@/app/store/useLanguageStore'
+import AnimatedFooter from '@/components/animatedFooter'
 
 export default function ContactPage() {
   const [message, setMessage] = useState('')
@@ -146,6 +147,7 @@ export default function ContactPage() {
           </div>
         </div>
       </div>
+      <AnimatedFooter />
     </div>
   )
 }
