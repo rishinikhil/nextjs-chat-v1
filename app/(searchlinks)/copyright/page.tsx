@@ -5,8 +5,6 @@ import useLanguageStore from '@/app/store/useLanguageStore'
 
 // Define the expected shape of the copyright content
 
-export const dynamic = 'force-dynamic'
-
 const CopyrightPage: React.FC = () => {
   const { currentLanguage, translations } = useLanguageStore()
   const copyrightData = translations[currentLanguage].copyrightData

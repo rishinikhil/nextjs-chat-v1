@@ -9,6 +9,8 @@ export const metadata = {
   title: 'Next.js AI Chatbot'
 }
 
+export const dynamic = 'force-dynamic'
+
 export default async function IndexPage() {
   const id = nanoid()
   const session = (await auth()) as Session
