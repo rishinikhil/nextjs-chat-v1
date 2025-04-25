@@ -30,7 +30,7 @@ export default function ContactPage() {
   }
 
   return (
-    <div className="min-h-[92vh] bg-gray-50">
+    <div className=" h-[94vh] flex flex-col justify-between bg-gray-50">
       <div className="container mx-auto px-4 py-12">
         {/* Header Section */}
         <div className="text-center mb-12">
