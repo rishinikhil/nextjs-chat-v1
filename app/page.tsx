@@ -59,11 +59,11 @@ const SearchPage: React.FC = () => {
   const currentTranslations = translations[currentLanguage]
 
   const presetItems = [
-    {
-      icon: Compass,
-      text: currentLanguage === 'hi' ? 'सफलता की कहानियाँ' : 'Success Stories',
-      route: '/successStories'
-    },
+    // {
+    //   icon: Compass,
+    //   text: currentLanguage === 'hi' ? 'सफलता की कहानियाँ' : 'Success Stories',
+    //   route: '/successStories'
+    // },
     {
       icon: Compass,
       text:

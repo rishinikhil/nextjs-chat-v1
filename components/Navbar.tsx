@@ -14,10 +14,10 @@ const Navbar = ({ isAdmin }: { isAdmin: boolean }) => {
             {currentLanguage === 'en' ? 'Home' : 'होम '}
           </Link>
           <Link href="/about-us" className="hover:text-[#22520F]">
-            {currentLanguage === 'en' ? 'About-us' : 'हमारे बारे में'}
+            {currentLanguage === 'en' ? 'About Us' : 'हमारे बारे में'}
           </Link>
           <Link href="/contact-us" className="hover:text-[#22520F]">
-            {currentLanguage === 'en' ? 'Contact-us' : 'संपर्क करें'}
+            {currentLanguage === 'en' ? 'Contact Us' : 'संपर्क करें'}
           </Link>
         </div>
       </div>

@@ -105,7 +105,7 @@ const AboutUs = () => {
           <h2 className="text-3xl font-bold text-center">Our Recognition</h2>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
             <motion.div className="text-center space-y-4" variants={fadeIn}>
-              <div className="bg-gray-50 p-6 rounded-lg h-32 flex items-center justify-center">
+              <div className="bg-gray-50 p-6 rounded-lg h-auto flex items-center justify-center">
                 <Link href={'/patent'} className="hover:underline">
                   <Image
                     src="/bioSarthiPatent.png"
@@ -131,7 +131,7 @@ const AboutUs = () => {
               <p className="font-medium">NASSCOM CoE Incubated</p>
             </motion.div>
             <motion.div className="text-center space-y-4" variants={fadeIn}>
-              <div className="bg-gray-50 p-6 rounded-lg h-32 flex items-center justify-center">
+              <div className="bg-gray-50 p-6 rounded-lg h-auto flex items-center justify-center">
                 <Image
                   src="/startUpIndia.png"
                   alt="DPIIT"

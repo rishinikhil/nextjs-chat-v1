@@ -11,9 +11,9 @@ const CopyrightPage: React.FC = () => {
 
   return (
     <>
-      <div className="h-[93vh] flex-col flex items-center justify-between pt-10">
+      <div className="h-[94vh] flex-col flex items-center justify-between pt-10">
         <motion.div
-          className="p-6 max-w-3xl mx-auto bg-white shadow-lg rounded-2xl"
+          className="p-6 mt-32 max-w-3xl mx-auto bg-white shadow-lg rounded-2xl"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}

@@ -13,7 +13,7 @@ export default function TermsAndConditions() {
   const contact = translations[currentLanguage].contactUs
   return (
     <>
-      <div className="h-[98vh] flex flex-col justify-between bg-white p-6 md:p-8">
+      <div className="h-[93vh] overflow-hidden flex flex-col justify-between bg-white pt-6 px-6 md:pt-8 md:px-6">
         <div className="mx-auto max-w-4xl space-y-7">
           <div className="text-center space-y-4">
             <h1 className="text-4xl font-semibold">
@@ -92,7 +92,7 @@ export default function TermsAndConditions() {
                     <div className="space-y-1">
                       <h3 className="font-semibold">{contact.address}</h3>
                       <p className="text-gray-600">
-                        CGF BioEnergy Pvt. Ltd.
+                        BioSarthi Technologies Pvt. Ltd.
                         <br />
                         NASSCOM CoE IoT
                         <br />

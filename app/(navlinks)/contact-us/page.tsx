@@ -100,7 +100,7 @@ export default function ContactPage() {
                       {content.contactUs.address}
                     </h3>
                     <p className="text-gray-600 hover:text-green-600 leading-relaxed">
-                      CGF BioEnergy Pvt. Ltd.
+                      BioSarthi Technologies Pvt. Ltd.
                       <br />
                       NASSCOM CoE IoT
                       <br />
