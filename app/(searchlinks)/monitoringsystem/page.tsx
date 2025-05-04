@@ -1,73 +1,85 @@
 'use client'
-import { motion } from 'framer-motion'
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow
-} from '@/components/ui/table'
-import useLanguageStore from '@/app/store/useLanguageStore'
+
+import React, { useState } from 'react'
+import { useKeenSlider } from 'keen-slider/react'
+import 'keen-slider/keen-slider.min.css'
 import AnimatedFooter from '@/components/animatedFooter'
 
-export default function MonitoringComparison() {
-  const { currentLanguage, translations } = useLanguageStore()
-  const monitoringData = translations[currentLanguage].monitoringData
-  const copyrightData = translations[currentLanguage].copyrightData
+const Carousel: React.FC = () => {
+  const [currentSlide, setCurrentSlide] = useState(0)
+  // Destructure as [ref, instanceRef]
+  const [sliderRef, instanceRef] = useKeenSlider<HTMLDivElement>({
+    loop: true,
+    slides: { perView: 1 },
+    slideChanged(s) {
+      setCurrentSlide(s.track.details.rel)
+    }
+  })
 
   return (
-    <div className="min-h-screen bg-white p-6 md:p-8">
-      <motion.div
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-        className="text-center space-y-4"
-      >
-        <h1 className="text-4xl font-semibold">
-          <span className="text-[#2E7D32]">
-            {monitoringData.title.firstPart}
-          </span>{' '}
-          <span className="text-[#D32F2F]">
-            {monitoringData.title.secondPart}
-          </span>
-        </h1>
-        <p className="text-gray-600 max-w-2xl mx-auto">
-          {monitoringData.introduction}
-        </p>
-      </motion.div>
+    <>
+      <div className="flex flex-col items-center justify-center h-screen">
+        {/* Carousel container: custom height, rounded corners */}
+        <div
+          ref={sliderRef}
+          className="keen-slider w-[50vw] border border-black py-5 max-w-3xl h-[78vh] rounded-2xl overflow-hidden shadow-lg"
+        >
+          <div className="keen-slider__slide">
+            <img
+              src="/sliderImage1.png"
+              alt="Slide 1"
+              className="object-contain w-full h-full"
+            />
+          </div>
+          <div className="keen-slider__slide">
+            <img
+              src="/sliderImage2.png"
+              alt="Slide 2"
+              className="object-contain w-full h-full"
+            />
+          </div>
+          <div className="keen-slider__slide">
+            <img
+              src="/sliderImage3.png"
+              alt="Slide 3"
+              className="object-contain w-full h-full"
+            />
+          </div>
+          <div className="keen-slider__slide">
+            <img
+              src="/sliderImage4.png"
+              alt="Slide 4"
+              className="object-contain w-full h-full"
+            />
+          </div>
+        </div>
 
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.3 }}
-        className="overflow-x-auto my-12"
-      >
-        <Table className="w-full border border-gray-200 shadow-lg">
-          <TableHeader>
-            <TableRow className="bg-green-700 text-white">
-              {monitoringData.headers.map((header, index) => (
-                <TableHead key={index} className="p-4 text-white">
-                  {header}
-                </TableHead>
-              ))}
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {monitoringData.rows.map((row, rowIndex) => (
-              <TableRow key={rowIndex} className="border-b">
-                {row.map((cell, cellIndex) => (
-                  <TableCell key={cellIndex} className="p-4 text-gray-800">
-                    {cell}
-                  </TableCell>
-                ))}
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </motion.div>
-
+        {/* Navigation and Download PDF button */}
+        <div className="mt-4 w-full max-w-3xl flex justify-start space-x-2">
+          <button
+            onClick={() => instanceRef.current?.prev()}
+            className="px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded-lg transition"
+          >
+            Prev
+          </button>
+          <button
+            onClick={() => instanceRef.current?.next()}
+            className="px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded-lg transition"
+          >
+            Next
+          </button>
+          <a
+            href="/BioSarthi_flyer.pdf"
+            download
+            className="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition"
+          >
+            Download PDF
+          </a>
+        </div>
+      </div>
       <AnimatedFooter />
-    </div>
+    </>
   )
 }
+
+export default Carousel

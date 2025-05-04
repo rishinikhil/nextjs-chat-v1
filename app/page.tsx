@@ -59,11 +59,11 @@ const SearchPage: React.FC = () => {
   const currentTranslations = translations[currentLanguage]
 
   const presetItems = [
-    {
-      icon: Compass,
-      text: currentLanguage === 'hi' ? 'सफलता की कहानियाँ' : 'Success Stories',
-      route: '/successStories'
-    },
+    // {
+    //   icon: Compass,
+    //   text: currentLanguage === 'hi' ? 'सफलता की कहानियाँ' : 'Success Stories',
+    //   route: '/successStories'
+    // },
     {
       icon: Compass,
       text:
@@ -217,7 +217,7 @@ const SearchPage: React.FC = () => {
   }
 
   return (
-    <div className="h-screen w-full absolute top-0" onKeyDown={handleKeyDown}>
+    <div className="h-[95vh] w-full absolute top-0" onKeyDown={handleKeyDown}>
       <GridSmallBackgroundDemo>
         <div className="min-h-screen flex flex-col">
           <div className="flex-grow flex items-center justify-center px-4">

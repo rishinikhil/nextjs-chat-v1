@@ -5,6 +5,7 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
 import useLanguageStore from '@/app/store/useLanguageStore'
+import AnimatedFooter from '@/components/animatedFooter'
 
 export default function ContactPage() {
   const [message, setMessage] = useState('')
@@ -29,7 +30,7 @@ export default function ContactPage() {
   }
 
   return (
-    <div className="min-h-[92vh] bg-gray-50">
+    <div className=" h-[94vh] flex flex-col justify-between bg-gray-50">
       <div className="container mx-auto px-4 py-12">
         {/* Header Section */}
         <div className="text-center mb-12">
@@ -99,7 +100,7 @@ export default function ContactPage() {
                       {content.contactUs.address}
                     </h3>
                     <p className="text-gray-600 hover:text-green-600 leading-relaxed">
-                      CGF BioEnergy Pvt. Ltd.
+                      BioSarthi Technologies Pvt. Ltd.
                       <br />
                       NASSCOM CoE IoT
                       <br />
@@ -146,6 +147,7 @@ export default function ContactPage() {
           </div>
         </div>
       </div>
+      <AnimatedFooter />
     </div>
   )
 }

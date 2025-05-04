@@ -1,4 +1,4 @@
-// Commenting original code 
+// Commenting original code
 // import React from 'react'
 
 // import { cn } from '@/lib/utils'
@@ -23,9 +23,15 @@
 //   )
 // }
 
-import React from 'react';
-import { cn } from '@/lib/utils';
-import { Dialog, DialogTrigger, DialogContent, DialogTitle, DialogDescription } from '@/components/ui/dialog';
+import React from 'react'
+import { cn } from '@/lib/utils'
+import {
+  Dialog,
+  DialogTrigger,
+  DialogContent,
+  DialogTitle,
+  DialogDescription
+} from '@/components/ui/dialog'
 
 export function FooterText({ className, ...props }: React.ComponentProps<'p'>) {
   return (
@@ -36,23 +42,43 @@ export function FooterText({ className, ...props }: React.ComponentProps<'p'>) {
       )}
       {...props}
     >
-      BioSarthi<sup>®</sup> AI Engine <span className="font-bold">Beta</span> | &copy; 2024 CGF BioEnergy Pvt. Ltd. | All Rights Reserved |{' '}
+      BioSarthi<sup>®</sup> AI Engine <span className="font-bold">Beta</span> |
+      &copy; 2024 BioSarthi Technologies Pvt. Ltd. | All Rights Reserved |{' '}
       <Dialog>
         <DialogTrigger asChild>
-          <button className="text-blue-500 hover:underline">
-            Disclaimer
-          </button>
+          <button className="text-blue-500 hover:underline">Disclaimer</button>
         </DialogTrigger>
         <DialogContent>
           <DialogTitle>Terms of Use & Disclaimer</DialogTitle>
           <DialogDescription className="space-y-4 text-justify">
-            <p>BioSarthi<sup>®</sup> AI Engine, developed by CGF BioEnergy Pvt. Ltd., is provided for informational purposes only. By using this service, you agree to these Terms of Use and Disclaimer.</p>
-            <p>CGF BioEnergy Pvt. Ltd. is not liable for any decisions or actions taken based on AI-generated responses. The company does not guarantee the accuracy or completeness of the information provided. The information shared should not be considered as professional advice. Please consult a professional for technical, financial, or legal matters.</p>
-            <p>All trademarks, logos, and content are the intellectual property of CGF BioEnergy Pvt. Ltd. We reserve the right to modify these terms at any time without prior notice. By using BioSarthi<sup>®</sup> AI Engine, you consent to these terms and agree to the disclaimers mentioned above.</p>
-            <p>For any questions or concerns, please contact us at hello[at]biosarthi.com.</p>
+            <p>
+              BioSarthi<sup>®</sup> AI Engine, developed by BioSarthi
+              Technologies Pvt. Ltd., is provided for informational purposes
+              only. By using this service, you agree to these Terms of Use and
+              Disclaimer.
+            </p>
+            <p>
+              BioSarthi Technologies Pvt. Ltd. is not liable for any decisions
+              or actions taken based on AI-generated responses. The company does
+              not guarantee the accuracy or completeness of the information
+              provided. The information shared should not be considered as
+              professional advice. Please consult a professional for technical,
+              financial, or legal matters.
+            </p>
+            <p>
+              All trademarks, logos, and content are the intellectual property
+              of BioSarthi Technologies Pvt. Ltd. We reserve the right to modify
+              these terms at any time without prior notice. By using BioSarthi
+              <sup>®</sup> AI Engine, you consent to these terms and agree to
+              the disclaimers mentioned above.
+            </p>
+            <p>
+              For any questions or concerns, please contact us at
+              hello[at]biosarthi.com.
+            </p>
           </DialogDescription>
         </DialogContent>
       </Dialog>
     </p>
-  );
+  )
 }
