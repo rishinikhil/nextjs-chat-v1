@@ -1,5 +1,5 @@
 'use server'
-
+// @ts-nocheck
 import { signIn } from '@/auth'
 import { User } from '@/lib/types'
 import { AuthError } from 'next-auth'
@@ -53,19 +53,9 @@ export async function authenticate(
       }
     }
   } catch (error) {
-    if (error instanceof AuthError) {
-      switch (error.type) {
-        case 'CredentialsSignin':
-          return {
-            type: 'error',
-            resultCode: ResultCode.InvalidCredentials
-          }
-        default:
           return {
             type: 'error',
             resultCode: ResultCode.UnknownError
           }
       }
     }
-  }
-}

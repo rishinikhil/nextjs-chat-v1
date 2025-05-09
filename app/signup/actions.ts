@@ -83,7 +83,7 @@ export async function signup(
       return result
     } catch (error) {
       if (error instanceof AuthError) {
-        switch (error.type) {
+        switch (error.name) {
           case 'CredentialsSignin':
             return {
               type: 'error',

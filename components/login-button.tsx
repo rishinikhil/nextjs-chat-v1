@@ -1,5 +1,4 @@
 'use client'
-
 import * as React from 'react'
 import { signIn } from 'next-auth/react'
 
@@ -19,14 +18,18 @@ export function LoginButton({
   ...props
 }: LoginButtonProps) {
   const [isLoading, setIsLoading] = React.useState(false)
+
+  const handleLogin = async () => {
+    setIsLoading(true)
+    const result = await signIn('github', { callbackUrl: `/` })
+
+    setIsLoading(false)
+  }
+
   return (
     <Button
       variant="outline"
-      onClick={() => {
-        setIsLoading(true)
-        // next-auth signIn() function doesn't work yet at Edge Runtime due to usage of BroadcastChannel
-        signIn('github', { callbackUrl: `/` })
-      }}
+      onClick={handleLogin}
       disabled={isLoading}
       className={cn(className)}
       {...props}
